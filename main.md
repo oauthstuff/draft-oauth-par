@@ -277,14 +277,40 @@ This section gives the error responses that go beyond the basic (#error_response
 ### Authentication Required
 If the signature validation fails, the authorization server shall return `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claims in the request object do not match the authenticated `client_id`.
 
+# Authorization Request
+
+The client uses the `request_uri` value as returned by the authorization server as authorization request parameter `request_uri`.
+
+```
+https://as.example.com/authorize?
+request_uri=urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM
+```
+Clients are encouraged to use the request URI as the only parameter in order to use the integrity and authenticity provided by the pushed request object.
+
+# Authorization Server Metadata
+
+If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
+
+`pushed_authorization_request_endpoint` : The url of the request object endpoint at which the client can exchange a request object for a request URI.
+
 
 # Security Considerations
 
-...
+## Request URI Guessing
+An attacker could attempt to guess and replay a valid request URI value and 
+try to impersonat the respective client. The AS MUST consider the considerations
+given in [JAR], section 10.2, clause d on request URI entropy.
+
+## Request Object Replay
+An attacker could replay a request URI captured from a legit authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
+
+## Client Policy Change
+The client policy might change between the lodging of the request object and the 
+authorization request using a particular request object. It is therefore recommended that the AS checks the request parameter against the client policy when processing the authorization request.
 
 # Privacy Considerations
 
-...
+TBD
 
 # Acknowledgements {#Acknowledgements}
       
