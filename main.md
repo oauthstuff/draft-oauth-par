@@ -59,7 +59,7 @@ wih a request URI that is used as reference to this data in a sub-sequent author
 
 # Introduction {#Introduction}
 
-In OAuth RFC6749 authorization request parameter are sent as URI query 
+In OAuth [@!RFC6749] authorization request parameter are sent as URI query 
 parameters. This is simple but also yields challenges:
 
 * integrity
@@ -71,30 +71,105 @@ JAR provides solutions for those challenges by allowing OAuth clients
 to wrap authorization request parameters in a signed, and optionally encrypted, 
 JWT, the so-called "request object". 
 
-In order cope with the size restrictions, JAR introduces the `request_uri`
+In order to cope with the size restrictions, JAR introduces the `request_uri`
 parameter that allows clients to send a reference to a request object 
 instead of the request object itself.    
 
 This draft complements JAR by providing an interoperable way to push 
 the payload of a request object to the AS in exchange for a `request_uri`.
 
-And it goes one step further by also allowing clients to push the conventional 
-authorization request parameters to the AS and turn them (internally in the AS)
-into a request object that the client can refer to in an authorization request. 
-
-This means existing OAuth clients can use this extension to get integrity, 
-confidentiality and authenticity just by sending the request data to a different
-location. 
+And it goes one step further by also allowing clients to push the  
+format encoded authorization request parameters to the AS and  
+turn them into a request URI that the client can refer to in an authorization request. 
 
 For example, the authorization request
 
 ```
 GET /authorize?response_type=code&client_id=s6BhdRkqt3&state= af0ifjsldkj
-       &redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb&code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U&code_challenge_method= S256&scope=ais
+       &redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
        
 ```
 
 could be send by the client as
+
+```
+POST https://as.example.com/ros/ HTTP/1.1
+Host: as.example.com
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+
+response_type=code&
+client_id=s6BhdRkqt3&
+state= af0ifjsldkj&
+redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+```
+
+The AS responds with a request URI,  
+
+```
+HTTP/1.1 201 Created
+Date: Tue, 2 May 2017 15:22:31 GMT
+Content-Type: application/json
+
+{
+
+   "request_uri": "urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM",
+   "expires_in": 3600
+}
+```
+
+which is used by the client in the authorization request as shown in the following
+
+```
+GET /authorize?request_uri=urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM
+```
+
+This way the pushed authorization request endpoint fosters OAuth security by providing all clients a simple migration path to integrity protected authorization request, but it als also allows clients requiring an even higher secrity level, especially cryptographially confirmed non-repudiation, to explitely adopt JWT-based request objects.   
+
+## Conventions and Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they
+appear in all capitals, as shown here.
+
+This specification uses the terms "access token", "refresh token",
+"authorization server", "resource server", "authorization endpoint",
+"authorization request", "authorization response", "token endpoint",
+"grant type", "access token request", "access token response", and
+"client" defined by The OAuth 2.0 Authorization Framework [@!RFC6749].
+
+# Pushed Authorization Request Endpoint
+
+The request object endpoint shall be a RESTful API at the authorization server that accepts `x-www-form-urlencoded` POST request.
+
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all extensions defined for the authorization endpoint. Examples include PKCE, JAR, ...., OpenID Connect.
+
+The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization endpoint. 
+
+Note that there's some potential ambiguity around the appropriate audience 
+value to use when JWT client assertion based authentication is employed. To address that ambiguity the issuer URL of the AS according to [RFC8414] MUST be used as the value of the audience. 
+
+## Request {#request}
+
+A client can send all parameter that usually comprise an authorization request to the pushed authorization request endpoint. A basic parameter set will typical include:
+
+* `response_type`
+* `redirect_uri`
+* `scope`
+* `state` 
+
+Depending on client type and authentication method, the request might also include the `client_id`.
+ 
+According to Security BCP the request MUST also include the PKCE parameters:
+
+* `code_challenge` and
+* `code_challenge_method`
+
+The client adds these parameters in `x-www-form-urlencoded` format to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token requests.
+
+This is illustrated by the following example
 
 ```
 POST https://as.example.com/ros/ HTTP/1.1
@@ -111,10 +186,25 @@ code_challenge_method= S256&
 scope=ais
 ```
 
-Note: the request to the pushed authorization endpoint is authenticated in the same way as token endpoint requests. This means the AS can establish confidence
-in the identity of a confidential client before the actual authorization process is conducted. 
+The AS MUST process the request as follows:
 
-AS responds to the request above with a request URI as shown in the following 
+1. The AS MUST authenticate the client in same way as at the token endpoint.
+2. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks, whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It may also check whether the client is authorized for the `scope` for which it requested access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
+
+## Sucessful Response
+
+If the verification is successful, the server shall generate a request URI and return a JSON payload that contains `request_uri` and `expires_in` claims at the top level with `201 Created` HTTP response code.
+
+* `request_uri` : The request URI corresponding to the request object posted. This URI is used as reference to the respective request object in subsequent authorization requests only. The way the authorization process obtains the request object data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the request object data available to other parties via this URI.
+* `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS.
+
+The `request_uri` value MUST be generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value.   
+
+The `request URI` MUST be bound to the `client_id` of the client that posted the authorization request.
+
+Since the request URI can be replayed, its lifetime SHOULD be short and preferably limited to one-time use.
+
+The following is an example of such a response:
 
 ```
 HTTP/1.1 201 Created
@@ -122,35 +212,71 @@ Date: Tue, 2 May 2017 15:22:31 GMT
 Content-Type: application/json
 
 {
-
-   "request_uri": "urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM",
-   "expires_in": 3600
+    "request_uri": "urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM",
+    "expires_in": 3600
 }
+``` 
+
+## Error Response {#error_response}
+
+### Error responses
+
+#### Authentication required
+If the client authentication fails, the authorization server shall return `401 Unauthorized` HTTP error response.
+
+#### Authorization required
+If the client is not authorized to perform the authorization request it wanted to post, the authorization server shall return `403 Forbidden` HTTP error response.
+
+#### Invalid request
+If the request object received is invalid, the authorization server shall return `400 Bad Request` HTTP error response.
+
+#### Method not allowed
+If the request did not use POST, the authorization server shall return `405 Method Not Allowed` HTTP error response.
+
+#### Request entity too large
+If the request size was beyond the upper bound that the authorization server allows, the authorization server shall return a `413 Request Entity Too Large` HTTP error response.
+
+#### Too many requests
+If the request from the client per a time period goes beyond the number the authorization server allows, the authorization server shall return a `429 Too Many Requests` HTTP error response.
+
+# "request" Parameter
+
+Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in [JAR] apply.  
+
+The following is an example of a request using a signed request object. The client is authenticated using its client secret `BASIC` authorization:
+
+```
+POST https://as.example.com/ros/ HTTP/1.1
+Host: as.example.com
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+
+request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
+FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJyZXNwb2
+5zZV90eXBlIjoiY29kZSIsImNsaWVudF9pZCI6InM2QmhkUmtxdDMiLCJyZWRpcmV
+jdF91cmkiOiJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsInNjb3BlIjoi
+YWlzIiwic3RhdGUiOiJhZjBpZmpzbGRraiIsImNvZGVfY2hhbGxlbmdlIjoiSzItb
+HRjODNhY2M0aDBjOXc2RVNDX3JFTVRKM2J3dy11Q0hhb2VLMXQ4VSIsImNvZGVfY2
+hhbGxlbmdlX21ldGhvZCI6IlMyNTYifQ.O49ffUxRPdNkN3TRYDvbEYVr1CeAL64u
+W4FenV3n9WlaFIRHeFblzv-wlEtMm8-tusGxeE9z3ek6FxkhvvLEqEpjthXnyXqqy
+Jfq3k9GSf5ay74ml_0D6lHE1hy-kVWg7SgoPQ-GB1xQ9NRhF3EKS7UZIrUHbFUCF0
+MsRLbmtIvaLYbQH_Ef3UkDLOGiU7exhVFTPeyQUTM9FF-u3K-zX-FO05_brYxNGLh
+VkO1G8MjqQnn2HpAzlBd5179WTzTYhKmhTiwzH-qlBBI_9GLJmE3KOipko9TfSpa2
+6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
 ```
 
-This request URI in turn would be used by the client in the authorization request as shown in the following
+Tthe AS needs to take the following steps beyond the processing rules defined in (#request):
 
-```
-GET /authorize?request_uri=urn:example:GkurKxf5T0Y-mnPFCHqWOMiZi4VS138cQO_V7PZHAdM
-```
+1. If applicable, the AS decrypts the request object as specified in [JAR], section 6.1.
+1. The AS validates the request object signature as specified in [JAR], section 6.2.
+1. If the client is a confidential client, the authorization server MUST check whether the authenticated `client_id` matches the `client_id` claim in the request objects. If they do not match, the authorization server MUST refuse to process the request. It is at the authorization server's discretion to require the `iss` claim to match the `client_id` as well.
 
-The pushed authorization request endpoint fosters OAuth security be providing all clients a simple migration path to integrity protected authorization request, but it als also allows clients requiring an even higher secrity level, especially cryptographially confirmed non-repudiation, to explitely adopt JWT-based request objects.   
+## Error responses for Request Object
+This section gives the error responses that go beyond the basic (#error_response).
 
-## Conventions and Terminology
+### Authentication Required
+If the signature validation fails, the authorization server shall return `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claims in the request object do not match the authenticated `client_id`.
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
-NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
-"MAY", and "OPTIONAL" in this document are to be interpreted as
-described in BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they
-appear in all capitals, as shown here.
-
-This specification uses the terms "access token", "refresh token",
-"authorization server", "resource server", "authorization endpoint",
-"authorization request", "authorization response", "token endpoint",
-"grant type", "access token request", "access token response", and
-"client" defined by The OAuth 2.0 Authorization Framework [@!RFC6749].
-
-# TBD
 
 # Security Considerations
 
@@ -162,7 +288,8 @@ This specification uses the terms "access token", "refresh token",
 
 # Acknowledgements {#Acknowledgements}
       
-We would would like to thank the FAPI WG of the OpenID Foundation and namely Brian Campbell, Daniel Fett, for their valuable feedback during the preparation of this draft.
+This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
+conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable work.
 
 We would like to thank ... for their valuable feedback on this draft.
 
