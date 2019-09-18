@@ -243,6 +243,8 @@ If the request from the client per a time period goes beyond the number the auth
 
 Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
+Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint.
+
 The following is an example of a request using a signed request object. The client is authenticated using its client secret `BASIC` authorization:
 
 ```
