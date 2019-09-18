@@ -162,13 +162,10 @@ A client can send all the parameters that usually comprise an authorization requ
 * `redirect_uri`
 * `scope`
 * `state` 
+* `code_challenge`  
+* `code_challenge_method`  
 
-Depending on client type and authentication method, the request might also include the `client_id` parameter.
- 
-According to Security BCP [@I-D.ietf-oauth-security-topics] the request MUST also include the PKCE parameters:
-
-* `code_challenge` and
-* `code_challenge_method`
+Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided.
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
@@ -182,7 +179,7 @@ This is illustrated by the following example
 
   response_type=code&
   state=af0ifjsldkj&
-  &client_id=s6BhdRkqt3
+  client_id=s6BhdRkqt3&
   redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&
   code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U&
   code_challenge_method=S256&
