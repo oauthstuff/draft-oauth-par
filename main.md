@@ -42,9 +42,9 @@ organization="Nomura Research Institute"
 initials="D."
 surname="Tonge"
 fullname="Dave Tonge"
-organization="Momentum Financial Technology"
+organization="Moneyhub Financial Technology"
     [author.address]
-    email = "dave.tonge@momentumft.co.uk"    
+    email = "dave@tonge.org"    
     
 %%%
 
@@ -165,7 +165,7 @@ A client can send all the parameters that usually comprise an authorization requ
 
 Depending on client type and authentication method, the request might also include the `client_id` parameter.
  
-According to Security BCP [@I-D.ietf-oauth-security-topics] the request MUST also include the PKCE parameters:
+According to the Security BCP [@I-D.ietf-oauth-security-topics] the request MUST also include the PKCE parameters:
 
 * `code_challenge` and
 * `code_challenge_method`
@@ -182,7 +182,7 @@ This is illustrated by the following example
 
   response_type=code&
   state=af0ifjsldkj&
-  &client_id=s6BhdRkqt3
+  client_id=s6BhdRkqt3&
   redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&
   code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U&
   code_challenge_method=S256&
@@ -294,18 +294,18 @@ Clients are encouraged to use the request URI as the only parameter in order to 
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange a request object for a request URI.
+`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange a for a request URI.
 
 
 # Security Considerations
 
 ## Request URI Guessing
 An attacker could attempt to guess and replay a valid request URI value and 
-try to impersonat the respective client. The AS MUST consider the considerations
+try to impersonate the respective client. The AS MUST consider the considerations
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
 
 ## Request Object Replay
-An attacker could replay a request URI captured from a legit authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
+An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
 
 ## Client Policy Change
 The client policy might change between the lodging of the request object and the 
@@ -318,7 +318,7 @@ TBD
 # Acknowledgements {#Acknowledgements}
       
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
-conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
+conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions.
 
 We would like to thank ... for their valuable feedback on this draft.
 
