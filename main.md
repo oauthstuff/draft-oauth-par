@@ -294,7 +294,7 @@ Clients are encouraged to use the request URI as the only parameter in order to 
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange a for a request URI.
+`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange a request object for a request URI.
 
 
 # Security Considerations
