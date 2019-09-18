@@ -62,10 +62,9 @@ wih a request URI that is used as reference to the data in a subsequent authoriz
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query 
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* integrity
-* authenticity
-* confidentiality of parameter values
-* size
+* There is no cryptographical integrity and authenticity protection, i.e. the request can be modified on its way throught the user agent and attackers can impersonate legitimate clients.
+* There is no mechanism to ensure confidentiality of the request parameters.
+* Authorization request URLs can become quite big, especially in scenarios requiring fine-grain authorization data.
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients 
 to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token
@@ -310,16 +309,12 @@ An attacker could replay a request URI captured from a legit authorization reque
 The client policy might change between the lodging of the request object and the 
 authorization request using a particular request object. It is therefore recommended that the AS checks the request parameter against the client policy when processing the authorization request.
 
-# Privacy Considerations
-
-TBD
-
 # Acknowledgements {#Acknowledgements}
       
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank ... for their valuable feedback on this draft.
+We would like to thank Filip Skokan for his valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
