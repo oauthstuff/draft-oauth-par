@@ -159,15 +159,10 @@ A client can send all parameter that usually comprise an authorization request t
 * `redirect_uri`
 * `scope`
 * `state` 
+* `code_challenge`  
+* `code_challenge_method`  
 
-Depending on client type and authentication method, the request might also include the `client_id`.
- 
-According to Security BCP the request MUST also include the PKCE parameters:
-
-* `code_challenge` and
-* `code_challenge_method`
-
-The client adds these parameters in `x-www-form-urlencoded` format to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token requests.
+Depending on client type and authentication method, the request might also include the `client_id`. The client adds these parameters in `x-www-form-urlencoded` format to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token requests.
 
 This is illustrated by the following example
 
@@ -179,10 +174,10 @@ Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
 
 response_type=code&
 client_id=s6BhdRkqt3&
-state= af0ifjsldkj&
+state=af0ifjsldkj&
 redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb&
 code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U&
-code_challenge_method= S256&
+code_challenge_method=S256&
 scope=ais
 ```
 
@@ -191,7 +186,7 @@ The AS MUST process the request as follows:
 1. The AS MUST authenticate the client in same way as at the token endpoint.
 2. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks, whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It may also check whether the client is authorized for the `scope` for which it requested access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
 
-## Sucessful Response
+## Successful Response
 
 If the verification is successful, the server shall generate a request URI and return a JSON payload that contains `request_uri` and `expires_in` claims at the top level with `201 Created` HTTP response code.
 
