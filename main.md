@@ -244,7 +244,9 @@ If the request from the client per a time period goes beyond the number the auth
 
 # "request" Parameter
 
-Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
+Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. This will allow both the Client & the AS to store the request object for the purposes of cryptographically confirmed non-repudiation.
+
+The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
 The following is an example of a request using a signed request object. The client is authenticated using its client secret `BASIC` authorization:
 
@@ -294,7 +296,7 @@ Clients are encouraged to use the request URI as the only parameter in order to 
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange a request object for a request URI.
+`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can exchange the authorization request parameters or request object for a request URI.
 
 
 # Security Considerations
@@ -304,12 +306,12 @@ An attacker could attempt to guess and replay a valid request URI value and
 try to impersonate the respective client. The AS MUST consider the considerations
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
 
-## Request Object Replay
+## Request URI Replay
 An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
 
 ## Client Policy Change
-The client policy might change between the lodging of the request object and the 
-authorization request using a particular request object. It is therefore recommended that the AS checks the request parameter against the client policy when processing the authorization request.
+The client policy might change between the lodging of the authorization request parameters or request object and the 
+authorization request using them. It is therefore recommended that the AS checks the authorization request parameters against the client policy when processing the authorization request.
 
 # Privacy Considerations
 
