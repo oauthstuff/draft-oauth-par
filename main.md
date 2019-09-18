@@ -62,10 +62,9 @@ wih a request URI that is used as reference to the data in a subsequent authoriz
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query 
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* integrity
-* authenticity
-* confidentiality of parameter values
-* size
+* There is no cryptographical integrity and authenticity protection, i.e. the request can be modified on its way throught the user agent and attackers can impersonate legitimate clients.
+* There is no mechanism to ensure confidentiality of the request parameters.
+* Authorization request URLs can become quite big, especially in scenarios requiring fine-grain authorization data.
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients 
 to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token
@@ -78,8 +77,7 @@ instead of the request object itself.
 This document complements JAR by providing an interoperable way to push 
 the payload of a request object directly to the AS in exchange for a `request_uri`.
 
-It also allows for clients to push the  
-form encoded authorization request parameters to the AS in order to   
+It also allows for clients to push the form encoded authorization request parameters to the AS in order to   
 exchange them for a request URI that the client can use in a subsequent authorization request. 
 
 For example, the following authorization request,
@@ -125,6 +123,7 @@ which is used by the client in the subsequent authorization request as follows,
 ```
   GET /authorize?request_uri=
     urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  Host: as.example.com
 ```
 
 The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.   
@@ -147,7 +146,7 @@ This specification uses the terms "access token", "refresh token",
 
 The pushed authorization request endpoint shall be a RESTful API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
 
-The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@!RFC7636], Resource Indicators [@!I-D.ietf-oauth-resource-indicators], and OpenID Connect [@!OIDC].
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization endpoint. 
 
@@ -162,13 +161,10 @@ A client can send all the parameters that usually comprise an authorization requ
 * `redirect_uri`
 * `scope`
 * `state` 
+* `code_challenge`  
+* `code_challenge_method`  
 
-Depending on client type and authentication method, the request might also include the `client_id` parameter.
- 
-According to the Security BCP [@I-D.ietf-oauth-security-topics] the request MUST also include the PKCE parameters:
-
-* `code_challenge` and
-* `code_challenge_method`
+Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided.
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
@@ -244,9 +240,11 @@ If the request from the client per a time period goes beyond the number the auth
 
 # "request" Parameter
 
-Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. This will allow both the Client & the AS to store the request object for the purposes of cryptographically confirmed non-repudiation.
+Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS.  This will allow both the Client and the AS to store the request object for the purposes of cryptographically confirmed non-repudiation.
 
 The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
+
+Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint.
 
 The following is an example of a request using a signed request object. The client is authenticated using its client secret `BASIC` authorization:
 
@@ -270,7 +268,7 @@ The following is an example of a request using a signed request object. The clie
   6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
 ```
 
-Tthe AS needs to take the following steps beyond the processing rules defined in (#request):
+The AS needs to take the following steps beyond the processing rules defined in (#request):
 
 1. If applicable, the AS decrypts the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
 1. The AS validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
@@ -289,6 +287,7 @@ The client uses the `request_uri` value as returned by the authorization server 
 ```
   GET /authorize?request_uri=
     urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  Host: as.example.com
 ```
 Clients are encouraged to use the request URI as the only parameter in order to use the integrity and authenticity provided by the pushed authorization request.
 
@@ -311,18 +310,14 @@ An attacker could replay a request URI captured from a legitimate authorization 
 
 ## Client Policy Change
 The client policy might change between the lodging of the authorization request parameters or request object and the 
-authorization request using them. It is therefore recommended that the AS checks the authorization request parameters against the client policy when processing the authorization request.
-
-# Privacy Considerations
-
-TBD
+authorization request using a particular request object. It is therefore recommended that the AS checks the authorization request parameters against the client policy when processing the authorization request.
 
 # Acknowledgements {#Acknowledgements}
       
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions.
 
-We would like to thank ... for their valuable feedback on this draft.
+We would like to thank Filip Skokan for his valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
