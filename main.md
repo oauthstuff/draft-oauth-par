@@ -162,7 +162,7 @@ A client can send all parameter that usually comprise an authorization request t
 * `code_challenge`  
 * `code_challenge_method`  
 
-Depending on client type and authentication method, the request might also include the `client_id`. The client adds these parameters in `x-www-form-urlencoded` format to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token requests.
+Depending on client type and authentication method, the request might also include the `client_id`. The client adds these parameters in `x-www-form-urlencoded` format to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token requests. The `request_uri` authorization request parameter MUST NOT be provided.
 
 This is illustrated by the following example
 
