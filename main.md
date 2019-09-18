@@ -42,9 +42,9 @@ organization="Nomura Research Institute"
 initials="D."
 surname="Tonge"
 fullname="Dave Tonge"
-organization="Momentum Financial Technology"
+organization="Moneyhub Financial Technology"
     [author.address]
-    email = "dave.tonge@momentumft.co.uk"    
+    email = "dave@tonge.org"    
     
 %%%
 
