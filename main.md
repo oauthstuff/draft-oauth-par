@@ -45,6 +45,14 @@ fullname="Dave Tonge"
 organization="Moneyhub Financial Technology"
     [author.address]
     email = "dave@tonge.org"    
+ 
+ [[author]]
+initials="F."
+surname="Skokan"
+fullname="Filip Skokan"
+organization="Auth0"
+    [author.address]
+    email = "filip.skokan@auth0.com"    
     
 %%%
 
@@ -314,7 +322,7 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank Filip Skokan for his valuable feedback on this draft.
+We would like to thank ... for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
@@ -352,4 +360,3 @@ We would like to thank Filip Skokan for his valuable feedback on this draft.
 
    *  first draft
    
-
