@@ -52,7 +52,7 @@ surname="Skokan"
 fullname="Filip Skokan"
 organization="Auth0"
     [author.address]
-    email = "filip.skokan@auth0.com"    
+    email = "panva.ip@gmail.com"    
     
 %%%
 
