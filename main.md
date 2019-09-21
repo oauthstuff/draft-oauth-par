@@ -61,7 +61,7 @@ organization="Auth0"
 This document defines the pushed authorization request endpoint, which allows
 clients to push the payload of an OAuth 2.0 authorization request to the
 authorization server via a direct request and provides them
-wih a request URI that is used as reference to the data in a subsequent authorization request.   
+with a request URI that is used as reference to the data in a subsequent authorization request.   
 
 {mainmatter}
 
@@ -70,13 +70,13 @@ wih a request URI that is used as reference to the data in a subsequent authoriz
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query 
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* There is no cryptographical integrity and authenticity protection, i.e. the request can be modified on its way throught the user agent and attackers can impersonate legitimate clients.
+* There is no cryptographical integrity and authenticity protection, i.e. the request can be modified on its way through the user-agent and attackers can impersonate legitimate clients.
 * There is no mechanism to ensure confidentiality of the request parameters.
-* Authorization request URLs can become quite big, especially in scenarios requiring fine-grain authorization data.
+* Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data.
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients 
 to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token
-(JWT), the so-called "request object". 
+(JWT), the so-called "Request Object". 
 
 In order to cope with the size restrictions, JAR introduces the `request_uri`
 parameter that allows clients to send a reference to a request object 
@@ -121,8 +121,7 @@ The AS responds with a request URI,
     
   {
 
-    "request_uri":
-       "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
+    "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
     "expires_in": 90
   }
 ```
@@ -134,7 +133,7 @@ which is used by the client in the subsequent authorization request as follows,
     urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it als also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.   
+The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.   
 
 ## Conventions and Terminology
 
@@ -200,7 +199,7 @@ The AS MUST process the request as follows:
 
 ## Successful Response
 
-If the verification is successful, the server shall generate a request URI and return a JSON payload that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
+If the verification is successful, the server shall generate a request URI and return a JSON response that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
 
 * `request_uri` : The request URI corresponding to the authorization request posted. This URI is used as reference to the respective request data in the subsequent authorization request only. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.
 * `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS.
@@ -250,7 +249,7 @@ If the request from the client per a time period goes beyond the number the auth
 
 Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
-Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint.
+Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than the `client_id` parameter which may be a part of the client authentication mechanism.
 
 The following is an example of a request using a signed request object. The client is authenticated using its client secret `BASIC` authorization:
 
@@ -274,7 +273,7 @@ The following is an example of a request using a signed request object. The clie
   6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
 ```
 
-Tthe AS needs to take the following steps beyond the processing rules defined in (#request):
+The AS needs to take the following steps beyond the processing rules defined in (#request):
 
 1. If applicable, the AS decrypts the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
 1. The AS validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
