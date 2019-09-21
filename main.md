@@ -6,7 +6,7 @@ area = "Security"
 workgroup = "Web Authorization Protocol"
 keyword = ["security", "oauth2"]
 
-date = 2019-09-10T12:00:00Z
+date = 2019-09-21T12:00:00Z
 
 [seriesInfo]
 name = "Internet-Draft"
@@ -74,19 +74,13 @@ parameters via redirection in the user-agent. This is simple but also yields cha
 * There is no mechanism to ensure confidentiality of the request parameters.
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data.
 
-JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients 
-to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token
-(JWT), the so-called "Request Object". 
+JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token (JWT), the so-called "Request Object". 
 
-In order to cope with the size restrictions, JAR introduces the `request_uri`
-parameter that allows clients to send a reference to a request object 
-instead of the request object itself.    
+In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.    
 
-This document complements JAR by providing an interoperable way to push 
-the payload of a request object directly to the AS in exchange for a `request_uri`.
+This document complements JAR by providing an interoperable way to push the payload of a request object directly to the AS in exchange for a `request_uri`.
 
-It also allows for clients to push the  
-form encoded authorization request parameters to the AS in order to   
+It also allows for clients to push the form encoded authorization request parameters to the AS in order to   
 exchange them for a request URI that the client can use in a subsequent authorization request. 
 
 For example, the following authorization request,
@@ -171,7 +165,7 @@ A client can send all the parameters that usually comprise an authorization requ
 * `code_challenge`  
 * `code_challenge_method`  
 
-Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided.
+Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
@@ -195,7 +189,7 @@ This is illustrated by the following example
 The AS MUST process the request as follows:
 
 1. The AS MUST authenticate the client in same way as at the token endpoint.
-2. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It may also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
+2. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
 
 ## Successful Response
 
@@ -245,7 +239,7 @@ If the request size was beyond the upper bound that the authorization server all
 #### Too many requests
 If the request from the client per a time period goes beyond the number the authorization server allows, the authorization server shall return a `429 Too Many Requests` HTTP error response.
 
-# "request" Parameter
+# "request" Parameter {#request_parameter}
 
 Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
