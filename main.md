@@ -143,7 +143,7 @@ This specification uses the terms "access token", "refresh token",
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint shall be a HTTP API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
+The pushed authorization request endpoint shall be an HTTP API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
 
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
 
@@ -165,7 +165,7 @@ A client can send all the parameters that usually comprise an authorization requ
 
 Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
 
-The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of a HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
+The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
 This is illustrated by the following example
 
