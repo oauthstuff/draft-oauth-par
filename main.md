@@ -143,7 +143,7 @@ This specification uses the terms "access token", "refresh token",
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint shall be a RESTful API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
+The pushed authorization request endpoint shall be a HTTP API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
 
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
 
@@ -313,7 +313,7 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank ... for their valuable feedback on this draft.
+We would like to thank Aaron Parecki for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
