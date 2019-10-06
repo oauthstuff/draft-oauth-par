@@ -156,14 +156,15 @@ value to use when JWT client assertion based authentication is employed. To addr
 
 A client can send all the parameters that usually comprise an authorization request to the pushed authorization request endpoint. A basic parameter set will typically include:
 
+* `client_id`
 * `response_type`
 * `redirect_uri`
 * `scope`
-* `state` 
-* `code_challenge`  
-* `code_challenge_method`  
+* `state`
+* `code_challenge`
+* `code_challenge_method`
 
-Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
+Depending on client type and authentication method, the request might also include other parameters for client authentication such as the `client_secret` parameter, the `client_assertion` parameter and the `client_assertion_type` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
