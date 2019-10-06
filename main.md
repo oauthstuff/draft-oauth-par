@@ -231,8 +231,8 @@ If the request object received is invalid, the authorization server shall return
 #### Method not allowed
 If the request did not use POST, the authorization server shall return `405 Method Not Allowed` HTTP error response.
 
-#### Request entity too large
-If the request size was beyond the upper bound that the authorization server allows, the authorization server shall return a `413 Request Entity Too Large` HTTP error response.
+#### Payload too large
+If the request size was beyond the upper bound that the authorization server allows, the authorization server shall return a `413 Payload Too Large` HTTP error response.
 
 #### Too many requests
 If the request from the client per a time period goes beyond the number the authorization server allows, the authorization server shall return a `429 Too Many Requests` HTTP error response.
