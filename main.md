@@ -159,11 +159,11 @@ A client can send all the parameters that usually comprise an authorization requ
 * `response_type`
 * `redirect_uri`
 * `scope`
-* `state` 
-* `code_challenge`  
-* `code_challenge_method`  
+* `state`
+* `code_challenge`
+* `code_challenge_method`
 
-Depending on client type and authentication method, the request might also include the `client_id` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
+Depending on client type and authentication method, the request might also include the `client_id` parameter.
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
@@ -187,7 +187,8 @@ This is illustrated by the following example
 The AS MUST process the request as follows:
 
 1. The AS MUST authenticate the client in same way as at the token endpoint.
-2. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
+2. The AS MUST must reject the request if the `request_uri` authorization request parameter is provided.
+3. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
 
 ## Successful Response
 
@@ -239,7 +240,7 @@ If the request from the client per a time period goes beyond the number the auth
 
 # "request" Parameter {#request_parameter}
 
-Clients MAY use the `request` parameter as defined in JAR to push a request object to the AS. The rules for signing and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
+Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
 Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than the `client_id` parameter which may be a part of the client authentication mechanism.
 
