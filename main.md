@@ -314,7 +314,7 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank Aaron Parecki for their valuable feedback on this draft.
+We would like to thank Aaron Parecki and Takahiko Kawasaki for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
@@ -350,7 +350,7 @@ We would like to thank Aaron Parecki for their valuable feedback on this draft.
    
    -01 
 
-   *  
+   * List `client_id` as one of the basic parameters 
    
    -00 
 
