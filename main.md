@@ -8,7 +8,7 @@ keyword = ["security", "oauth2"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-lodderstedt-oauth-par-00"
+value = "draft-lodderstedt-oauth-par-01"
 stream = "IETF"
 status = "standard"
 
@@ -346,7 +346,11 @@ We would like to thank Aaron Parecki for their valuable feedback on this draft.
 # Document History
 
    [[ To be removed from the final specification ]]
+   
+   -01 
 
+   *  
+   
    -00 
 
    *  first draft
