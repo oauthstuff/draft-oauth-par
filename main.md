@@ -352,6 +352,7 @@ We would like to thank Aaron Parecki and Takahiko Kawasaki for their valuable fe
    -01 
 
    * List `client_id` as one of the basic parameters 
+   * Explicitly forbid `request_uri` in the processing rules
    
    -00 
 
