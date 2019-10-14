@@ -191,6 +191,8 @@ The AS MUST process the request as follows:
 2. The AS MUST must reject the request if the `request_uri` authorization request parameter is provided.
 3. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
 
+The AS MAY allow confidential clients to register per-authorization request redirect URIs. This is possible since, in contrast to [@!RFC6749], PAR gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed. This mechanism is especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs), for example in Open Banking, and are unable to use dynamic client registration to establish AS-specific redirect URIs (as recommended by [@I-D.ietf-oauth-security-topics], section-3.1).  
+
 ## Successful Response
 
 If the verification is successful, the server shall generate a request URI and return a JSON response that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
@@ -302,6 +304,9 @@ If the authorization server has a pushed authorization request endpoint, it SHOU
 An attacker could attempt to guess and replay a valid request URI value and 
 try to impersonat the respective client. The AS MUST consider the considerations
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
+
+## Open Redirection
+An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The AS MUST only accept new redirect URIs in the PAR request from confidential clients after sucessful authentication and authorization. 
 
 ## Request Object Replay
 An attacker could replay a request URI captured from a legit authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
