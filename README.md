@@ -4,9 +4,10 @@ This repository contains the IETF draft on OAuth Pushed Authorization Requests.
 
 `main.md` is the source in markdown format. 
 
-To build the xml2rfc file and transform it into html and txt run `make-v2.sh` or `make`.
-You need to have installed https://github.com/mmarkdown/mmark and https://pypi.org/project/xml2rfc/
-as prerequisites.
+To build the xml2rfc file and transform it into html and txt run `make-v2.sh`
+or `make`, or use Docker (see "Docker" section below).
+You need to have installed https://github.com/mmarkdown/mmark and
+https://pypi.org/project/xml2rfc/ as prerequisites.
 
 ### Set up
 
@@ -50,4 +51,17 @@ $ make txt
 ```
 $ make help
 ```
+
+### Docker
+
+If you encounter errors caused by the build tools
+(e.g. _"flag provided but not defined: -2"_ by `mmark`) or
+if you like Docker and don't care about unnecessary rebuilding,
+try the following.
+
+```
+$ docker run -v `pwd`:/data danielfett/markdown2rfc
+```
+
+See https://github.com/oauthstuff/markdown2rfc for details.
 
