@@ -187,7 +187,7 @@ This is illustrated by the following example
 
 The AS MUST process the request as follows:
 
-1. The AS MUST authenticate the client in same way as at the token endpoint.
+1. The AS MUST authenticate a confidential client in the same way as at the token endpoint."
 2. The AS MUST must reject the request if the `request_uri` authorization request parameter is provided.
 3. The AS MUST validate the request the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the `client_id`. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. 
 
@@ -314,7 +314,13 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank Aaron Parecki, Joseph Heenan, and Takahiko Kawasaki for their valuable feedback on this draft.
+We would like to thank
+Vladimir Dzhuvinov,
+Aaron Parecki,
+Joseph Heenan,
+and
+Takahiko Kawasaki
+    for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
