@@ -242,7 +242,7 @@ Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsr
 
 Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than the `client_id` parameter which may be a part of the client authentication mechanism.
 
-The following is an example of a request using a signed request object. The client is authenticated using its client secret in Basic Authentication:
+The following is an example of a request using a signed request object. The client is authenticated by its client secret using HTTP Basic Authentication [@!RFC7617]:
 
 ```
   POST /as/par HTTP/1.1
