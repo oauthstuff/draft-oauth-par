@@ -124,6 +124,11 @@ which is used by the client in the subsequent authorization request as follows,
 
 The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
+As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. 
+
+This is directly utilized by this draft to allow confidential clients to set the redirect URI for 
+every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
+
 ## Conventions and Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
@@ -187,6 +192,13 @@ The AS MUST process the request as follows:
 1. The AS MUST authenticate the client in the same way as at the token endpoint.
 2. The AS MUST reject the request if the `request_uri` authorization request parameter is provided.
 3. The AS MUST validate the request in the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client. It MUST also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
+
+The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed. 
+
+This feature gives clients more flexibility in bulding redirect URIs and, if the client IDs and credentials 
+are managed by some authority (CA or other type), the explicit client registration with the particular AS (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
+makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs), 
+for example in Open Banking, where the certificate provided as part of a federated PKI.
 
 ## Successful Response
 
@@ -299,6 +311,9 @@ An attacker could attempt to guess and replay a valid request URI value and
 try to impersonate the respective client. The AS MUST consider the considerations
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
 
+## Open Redirection
+An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The AS MUST only accept new redirect URIs in the PAR request from confidential clients after sucessful authentication and authorization. 
+
 ## Request Object Replay
 An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
 
@@ -307,6 +322,7 @@ The client policy might change between the lodging of the request object and the
 authorization request using a particular request object. It is therefore recommended that the AS check the request parameter against the client policy when processing the authorization request.
 
 # Acknowledgements {#Acknowledgements}
+
 This specification is based on the work towards [Pushed Request Object](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial-grade API working group at the OpenID Foundation. We would like to thank the members of the WG for their valuable contributions.
 
