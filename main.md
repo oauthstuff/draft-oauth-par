@@ -186,7 +186,7 @@ The AS MUST process the request as follows:
 
 1. The AS MUST authenticate the client in the same way as at the token endpoint.
 2. The AS MUST reject the request if the `request_uri` authorization request parameter is provided.
-3. The AS MUST validate the request in the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client. It MAY also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
+3. The AS MUST validate the request in the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client. It MUST also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
 
 ## Successful Response
 
