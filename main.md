@@ -216,24 +216,23 @@ The following is an example of such a response:
 
 ## Error Response {#error_response}
 
-### Error responses
+The authorization server responds with an error response in the same way as defined for the token endpoint in [@!RFC6749].
 
-#### Authentication required
-If the client authentication fails, the authorization server shall return `401 Unauthorized` HTTP error response.
+In addition to the error codes as defined in Section 5.2 of [@!RFC6749], the pushed authorization request endpoint will also respond with the following HTTP status codes, and, if necessary, error codes. 
 
-#### Authorization required
-If the client is not authorized to perform the authorization request it wanted to post, the authorization server shall return `403 Forbidden` HTTP error response.
+### Unsupported Response Type
+The authorization server does not support obtaining an authorization code using this method. The AS responds with HTTP status code 400 and `error` value `unsupported_response_type`.
+              
+### Invalid Redirect URI
+The requested redirect URI is invalid or mismatching. The AS responds with HTTP status code 400 and `error` value `invalid_redirect_uri`. 
 
-#### Invalid request
-If the request object received is invalid, the authorization server shall return `400 Bad Request` HTTP error response.
-
-#### Method not allowed
+### Method not allowed
 If the request did not use POST, the authorization server shall return `405 Method Not Allowed` HTTP error response.
 
-#### Payload too large
+### Payload too large
 If the request size was beyond the upper bound that the authorization server allows, the authorization server shall return a `413 Payload Too Large` HTTP error response.
 
-#### Too many requests
+### Too many requests
 If the request from the client per a time period goes beyond the number the authorization server allows, the authorization server shall return a `429 Too Many Requests` HTTP error response.
 
 # "request" Parameter {#request_parameter}
@@ -311,7 +310,13 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Object](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial-grade API working group at the OpenID Foundation. We would like to thank the members of the WG for their valuable contributions.
 
-We would like to thank Aaron Parecki and Takahiko Kawasaki for their valuable feedback on this draft.
+We would like to thank
+Vladimir Dzhuvinov,
+Aaron Parecki,
+Joseph Heenan,
+and
+Takahiko Kawasaki
+    for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
