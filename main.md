@@ -225,12 +225,9 @@ In addition to the error codes as defined in Section 5.2 of [@!RFC6749], the pus
 
 ### Unsupported Response Type
 The authorization server does not support obtaining an authorization code using this method. The AS responds with HTTP status code 400 and `error` value `unsupported_response_type`.
-
-### Invalid Scope
-The requested scope is invalid, unknown, or malformed. The AS responds with HTTP status code 400 and `error` value `invalid_scope`. 
               
 ### Invalid Redirect URI
-The requested scope is invalid, unknown, or malformed. The AS responds with HTTP status code 400 and `error` value `invalid_redirect_uri`. 
+The requested redirect URI is invalid or mismatching. The AS responds with HTTP status code 400 and `error` value `invalid_redirect_uri`. 
 
 ### Method not allowed
 If the request did not use POST, the authorization server shall return `405 Method Not Allowed` HTTP error response.
@@ -317,7 +314,7 @@ authorization request using a particular request object. It is therefore recomme
 This specification is based on the work towards [Pushed Request Objects](https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md)
 conducted at the Financial Grade API working group at the OpenID Foundation. We would would like to thank the members of this WG for their valuable contributions work.
 
-We would like to thank Aaron Parecki and Takahiko Kawasaki for their valuable feedback on this draft.
+We would like to thank Aaron Parecki, Joseph Heenan, and Takahiko Kawasaki for their valuable feedback on this draft.
 
 # IANA Considerations {#iana_considerations}
 
