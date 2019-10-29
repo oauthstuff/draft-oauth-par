@@ -129,7 +129,7 @@ The pushed authorization request endpoint thus fosters OAuth security by providi
 As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. 
 
 This is directly utilized by this draft to allow confidential clients to set the redirect URI for 
-every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), client registration could practically be skipped.
+every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
 
 ## Conventions and Terminology
 
@@ -198,7 +198,7 @@ The AS MUST process the request as follows:
 The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed. 
 
 This feature gives clients more flexibility in bulding redirect URIs and, if the client IDs and credentials 
-are managed by some authority (CA or other type), the client registration could practically be skipped. This
+are managed by some authority (CA or other type), the explicite client registration with the particular AS (manually or via dynamic client registration [@!RFC7591] could practically be skipped. This
 makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs), 
 for example in Open Banking, where the certificate provided as part of a federated PKI.
 
