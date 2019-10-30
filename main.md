@@ -217,8 +217,8 @@ The following is an example of such a response:
 
 ```
   HTTP/1.1 201 Created
-  Date: Tue, 2 May 2017 15:22:31 GMT
   Content-Type: application/json
+  Cache-Control: no-cache, no-store
 
   {
     "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
@@ -251,8 +251,7 @@ The following is an example of an error response with additional error parameter
 ```
   HTTP/1.1 401 Unauthorized
   Content-Type: application/json
-  Cache-Control: no-store
-  Pragma: no-cache
+  Cache-Control: no-cache, no-store
 
   {
     "error": "invalid_redirect_uri",
