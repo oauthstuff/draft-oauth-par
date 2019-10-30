@@ -234,9 +234,6 @@ If the authorization server sets an error code, it SHOULD be one of the defined 
 
 In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes, and, if necessary, error codes.
 
-### Unsupported Response Type
-The authorization server does not support obtaining an authorization code using this method. The AS responds with an HTTP 400 (Bad Request) status code and error code `unsupported_response_type`.
-
 ### Invalid Redirect URI
 The requested redirection URI is missing, invalid or doesn't match a registered one for the client. The AS responds with an HTTP 400 (Bad Request) status code and error code `invalid_redirect_uri`.
 
