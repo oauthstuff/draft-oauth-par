@@ -124,9 +124,9 @@ which is used by the client in the subsequent authorization request as follows,
 
 The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
-As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. 
+As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before.
 
-This is directly utilized by this draft to allow confidential clients to set the redirect URI for 
+This is directly utilized by this draft to allow confidential clients to set the redirect URI for
 every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
 
 ## Conventions and Terminology
@@ -149,7 +149,7 @@ The pushed authorization request endpoint shall be an HTTP API at the authorizat
 
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
 
-The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization endpoint.
+The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
 Note that there's some potential ambiguity around the appropriate audience
 value to use when JWT client assertion based authentication is employed. To address that ambiguity the issuer identifier URL of the AS according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the AS MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
@@ -170,7 +170,7 @@ Depending on client type and authentication method, the request might also inclu
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
-This is illustrated by the following example
+This is illustrated by the following example:
 
 ```
   POST /as/par HTTP/1.1
@@ -193,11 +193,11 @@ The AS MUST process the request as follows:
 2. The AS MUST reject the request if the `request_uri` authorization request parameter is provided.
 3. The AS MUST validate the request in the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client. It MUST also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
 
-The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed. 
+The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed.
 
-This feature gives clients more flexibility in bulding redirect URIs and, if the client IDs and credentials 
+This feature gives clients more flexibility in building redirect URIs and, if the client IDs and credentials
 are managed by some authority (CA or other type), the explicit client registration with the particular AS (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
-makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs), 
+makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs),
 for example in Open Banking, where the certificate provided as part of a federated PKI.
 
 ## Successful Response
@@ -298,7 +298,7 @@ The AS needs to take the following steps beyond the processing rules defined in 
 This section gives the error responses that go beyond the basic (#error_response).
 
 ### Authentication Required
-If the signature validation fails, the authorization server shall return `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
+If the signature validation fails, the authorization server shall return a `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
 
 # Authorization Request
 
@@ -325,7 +325,7 @@ try to impersonate the respective client. The AS MUST consider the consideration
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
 
 ## Open Redirection
-An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The AS MUST only accept new redirect URIs in the PAR request from confidential clients after sucessful authentication and authorization. 
+An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The AS MUST only accept new redirect URIs in the PAR request from confidential clients after sucessful authentication and authorization.
 
 ## Request Object Replay
 An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
