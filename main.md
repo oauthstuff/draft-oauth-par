@@ -249,13 +249,14 @@ If the request from the client for a time period goes beyond the number the auth
 The following is an example of an error response with additional error parameters:
 
 ```
-  HTTP/1.1 401 Unauthorized
+  HTTP/1.1 400 Bad Request
   Content-Type: application/json
   Cache-Control: no-cache, no-store
 
   {
     "error": "invalid_redirect_uri",
-    "error_description": "The redirect_uri is missing, invalid or mismatching"
+    "error_description":
+      "The redirect_uri is not valid for the given client"
   }
 ```
 
