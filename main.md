@@ -67,7 +67,7 @@ with a request URI that is used as reference to the data in a subsequent authori
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* There is no cryptographical integrity and authenticity protection, i.e. the request can be modified on its way through the user-agent and attackers can impersonate legitimate clients.
+* There is no cryptographic integrity and authenticity protection, i.e. the request can be modified on its way through the user-agent and attackers can impersonate legitimate clients.
 * There is no mechanism to ensure confidentiality of the request parameters.
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data.
 
@@ -145,7 +145,7 @@ This specification uses the terms "access token", "refresh token",
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint shall be an HTTP API at the authorization server that accepts `x-www-form-urlencoded` POST requests.
+The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
 
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
 
@@ -298,7 +298,7 @@ The AS needs to take the following steps beyond the processing rules defined in 
 This section gives the error responses that go beyond the basic (#error_response).
 
 ### Authentication Required
-If the signature validation fails, the authorization server shall return a `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
+If the signature validation fails, the authorization server returns a `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
 
 # Authorization Request
 
