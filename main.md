@@ -88,7 +88,7 @@ For example, the following authorization request,
   Host: as.example.com
 ```
 
-could be pushed directly to the AS by the client as follows,
+could be pushed directly to the AS by the client as follows:
 
 ```
   POST /as/par HTTP/1.1
@@ -122,7 +122,7 @@ which is used by the client in the subsequent authorization request as follows,
     urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-The pushed authorization request endpoint thus fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
+The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
 As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before.
 
@@ -198,7 +198,7 @@ The AS MAY allow confidential clients to establish per-authorization request red
 This feature gives clients more flexibility in building redirect URIs and, if the client IDs and credentials
 are managed by some authority (CA or other type), the explicit client registration with the particular AS (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
 makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs),
-for example in Open Banking, where the certificate provided as part of a federated PKI.
+for example in Open Banking, where the certificate is provided as part of a federated PKI.
 
 ## Successful Response
 
@@ -297,7 +297,7 @@ If the signature validation fails, the authorization server returns a `401 Unaut
 
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server as the authorization request parameter `request_uri`.
+The client uses the `request_uri` value returned by the authorization server as the authorization request parameter `request_uri` as defined in JAR.
 
 ```
   GET /authorize?request_uri=
@@ -378,6 +378,9 @@ Takahiko Kawasaki
 
    * List `client_id` as one of the basic parameters 
    * Explicitly forbid `request_uri` in the processing rules
+   * Clarification regarding client authentication and that public clients are allowed
+   * Added option to let clients register per-authorization request redirect URIs
+   * General clean up and wording improvments
    
    -00 
 
