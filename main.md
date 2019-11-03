@@ -228,25 +228,19 @@ The following is an example of such a response:
 
 ## Error Response {#error_response}
 
-For an error the authorization server sets an appropriate HTTP status code and MAY include additional error parameters in the format specified for the token endpoint in Section 5.2 of [@!RFC6749].
+For an error the authorization server sets an appropriate HTTP status code and MAY include additional error parameters in the entity-body of the HTTP response using the format specified for the token endpoint in Section 5.2 of [@!RFC6749].
 
 If the authorization server sets an error code, it SHOULD be one of the defined codes for the token endpoint in Section 5.2 or for the authorization endpoint in Sections 4.1.2.1 and 4.2.2.1 of [@!RFC6749], or by an OAuth extension if one is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorisation request doesn't involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are not returned.
 
-In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes, and, if necessary, error codes.
+In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes:
 
-### Invalid Redirect URI
-The requested redirection URI is missing, invalid or doesn't match a registered one for the client. The AS responds with an HTTP 400 (Bad Request) status code and error code `invalid_redirect_uri`.
+* 405: If the request did not use POST, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
 
-### Method not allowed
-If the request did not use POST, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
+* 413: If the request size was beyond the upper bound that the authorization server allows, the authorization server responds with an HTTP 413 (Payload Too Large) status code.
 
-### Payload too large
-If the request size was beyond the upper bound that the authorization server allows, the authorization server reponds with an HTTP 413 (Payload Too Large) status code.
+* 429: If the request from the client for a time period goes beyond the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.
 
-### Too many requests
-If the request from the client for a time period goes beyond the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.
-
-The following is an example of an error response with additional error parameters:
+The following is an example of an error response from the pushed authorization request endpoint:
 
 ```
   HTTP/1.1 400 Bad Request
@@ -254,7 +248,7 @@ The following is an example of an error response with additional error parameter
   Cache-Control: no-cache, no-store
 
   {
-    "error": "invalid_redirect_uri",
+    "error": "invalid_request",
     "error_description":
       "The redirect_uri is not valid for the given client"
   }
