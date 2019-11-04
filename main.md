@@ -380,7 +380,7 @@ Takahiko Kawasaki
    * Explicitly forbid `request_uri` in the processing rules
    * Clarification regarding client authentication and that public clients are allowed
    * Added option to let clients register per-authorization request redirect URIs
-   * General clean up and wording improvments
+   * General clean up and wording improvements
    
    -00 
 
