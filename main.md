@@ -259,7 +259,7 @@ The following is an example of an error response from the pushed authorization r
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
 
-Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than the `client_id` parameter which may be a part of the client authentication mechanism.
+Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than ones for client authentication such as the `client_id` parameter, the `client_secret` parameter, the `client_assertion` parameter and the `client_assertion_type` parameter.
 
 The following is an example of a request using a signed request object. The client is authenticated by its client secret using HTTP Basic Authentication [@!RFC7617]:
 
