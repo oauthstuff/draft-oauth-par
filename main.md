@@ -257,11 +257,9 @@ The following is an example of an error response from the pushed authorization r
 
 # "request" Parameter {#request_parameter}
 
-Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply.  
+Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@I-D.ietf-oauth-mtls] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
 
-Clients MUST NOT combine other authorization request parameters with the `request` parameter at the pushed authorization request endpoint other than the `client_id` parameter which may be a part of the client authentication mechanism.
-
-The following is an example of a request using a signed request object. The client is authenticated by its client secret using HTTP Basic Authentication [@!RFC7617]:
+The following is an example of a pushed authorization request using a signed request object. The client is authenticated by its client secret using HTTP Basic Authentication [@!RFC7617]:
 
 ```
   POST /as/par HTTP/1.1
