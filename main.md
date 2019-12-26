@@ -375,6 +375,7 @@ Takahiko Kawasaki
    -02
 
    * Reference RFC6749 sec 2.3.1 for client secret basic rather than RFC7617
+   * further clarify that a request object JWT contains all the authorization request parameters while client authentication params, if applicable, are outside that JWT as regular form encoded params in HTTP body
    
    -01 
 
