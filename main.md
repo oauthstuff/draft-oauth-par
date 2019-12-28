@@ -8,7 +8,7 @@ keyword = ["security", "oauth2"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-lodderstedt-oauth-par-02"
+value = "draft-ietf-oauth-par-00"
 stream = "IETF"
 status = "standard"
 
@@ -372,7 +372,7 @@ Takahiko Kawasaki
 
    [[ To be removed from the final specification ]]
 
-   -02
+   -00 (WG draft)
 
    * Reference RFC6749 sec 2.3.1 for client secret basic rather than RFC7617
    * further clarify that a request object JWT contains all the authorization request parameters while client authentication params, if applicable, are outside that JWT as regular form encoded params in HTTP body
