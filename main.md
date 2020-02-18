@@ -1,6 +1,6 @@
 %%%
 title = "OAuth 2.0 Pushed Authorization Requests"
-abbrev = "oauth-par"
+abbrev = "OAuth PAR"
 ipr = "trust200902"
 area = "Security"
 workgroup = "Web Authorization Protocol"
@@ -8,7 +8,7 @@ keyword = ["security", "oauth2"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-ietf-oauth-par-00"
+value = "draft-ietf-oauth-par-01"
 stream = "IETF"
 status = "standard"
 
@@ -371,6 +371,10 @@ Takahiko Kawasaki
 # Document History
 
    [[ To be removed from the final specification ]]
+
+   -01
+
+   * Use the newish RFC v3 XML and HTML format
 
    -00 (WG draft)
 
