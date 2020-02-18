@@ -342,7 +342,22 @@ Takahiko Kawasaki
 
 # IANA Considerations {#iana_considerations}
 
-...
+## 
+This specification requests registration of the following value in the IANA "OAuth Authorization Server Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC8414]. 
+
+{spacing="compact"}
+Metadata Name:
+: `pushed_authorization_request_endpoint`
+
+Metadata Description:
+: URL of the authorization server's pushed authorization request endpoint
+ 
+Change Controller:
+: IESG
+
+Specification Document(s):
+: [[ this document ]]
+
 
 <reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
   <front>
@@ -366,6 +381,16 @@ Takahiko Kawasaki
   </front>
 </reference>
 
+<reference anchor="IANA.OAuth.Parameters" target="http://www.iana.org/assignments/oauth-parameters">
+ <front>
+  <title>OAuth Parameters</title>
+  <author>
+    <organization>IANA</organization>
+  </author>
+  <date/>
+ </front>
+</reference>
+
 {backmatter}
 
 # Document History
@@ -373,16 +398,21 @@ Takahiko Kawasaki
    [[ To be removed from the final specification ]]
 
    -01
-
+   
+{spacing="compact"}
    * Use the newish RFC v3 XML and HTML format
+   * Added IANA registration request for `pushed_authorization_request_endpoint`
+   * Changed abbrev to "OAuth PAR"
 
    -00 (WG draft)
-
+   
+{spacing="compact"}
    * Reference RFC6749 sec 2.3.1 for client secret basic rather than RFC7617
    * further clarify that a request object JWT contains all the authorization request parameters while client authentication params, if applicable, are outside that JWT as regular form encoded params in HTTP body
    
    -01 
-
+   
+{spacing="compact"}
    * List `client_id` as one of the basic parameters 
    * Explicitly forbid `request_uri` in the processing rules
    * Clarification regarding client authentication and that public clients are allowed
