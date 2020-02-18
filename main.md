@@ -8,7 +8,7 @@ keyword = ["security", "oauth2"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-ietf-oauth-par-01"
+value = "draft-ietf-oauth-par-02"
 stream = "IETF"
 status = "standard"
 
@@ -396,6 +396,10 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
+
+   -02
+
+   *
 
    -01
    
