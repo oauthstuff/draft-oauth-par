@@ -147,7 +147,7 @@ This specification uses the terms "access token", "refresh token",
 
 The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
 
-The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@I-D.ietf-oauth-resource-indicators], and OpenID Connect [@OIDC].
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC].
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
@@ -399,7 +399,7 @@ Specification Document(s):
 
    -02
 
-   *
+   * Update Resource Indicators reference to the somewhat recently published RFC 8707
 
    -01
    
