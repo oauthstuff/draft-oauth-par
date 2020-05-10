@@ -149,7 +149,13 @@ The pushed authorization request endpoint is an HTTP API at the authorization se
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the `pushed_authorization_request_endpoint` Server Metadata parameter as defined in (#server_metadata) in its discovery responses.
 
-The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC].
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint also supports sending all authorization request parameters as request object according to [@!I-D.ietf-oauth-jwsreq].
+
+Note: the authorization server or the client MAY require to use request objects only. 
+
+If the authorization server requires request objects at its pushed authorization endpoint, it SHOULD include the `require_request_objects` Server Metadata parameter as defined in (#server_metadata) in its discovery responses.
+
+If the client uses dynamic client registration, setting the metadata parameter `request_object_signing_alg` MUST cause the authorization server to accept request objects for that particular client at the pushed authorization request endpoint only.
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
@@ -233,6 +239,8 @@ The following is an example of such a response:
 For an error the authorization server sets an appropriate HTTP status code and MAY include additional error parameters in the entity-body of the HTTP response using the format specified for the token endpoint in Section 5.2 of [@!RFC6749].
 
 If the authorization server sets an error code, it SHOULD be one of the defined codes for the token endpoint in Section 5.2 or for the authorization endpoint in Sections 4.1.2.1 and 4.2.2.1 of [@!RFC6749], or by an OAuth extension if one is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorisation request doesn't involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are not returned.
+
+If the authorization server or the client's policy require use of request objects only at the pushed authorization endpoint, the authorization server will return a HTTP status code 400 along with the error `invalid_request`.
 
 In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes:
 
@@ -372,6 +380,18 @@ Change Controller:
 Specification Document(s):
 : [[ this document ]]
 
+Metadata Name:
+: `require_request_objects`
+
+Metadata Description:
+: Boolean parameter indicating whether the authorization server accepts request objects only at the pushed authorization endpoint. The default is `false`. 
+ 
+Change Controller:
+: IESG
+
+Specification Document(s):
+: [[ this document ]]
+
 ## OAuth Dynamic Client Registration Metadata
 
 This specification requests registration of the following value in the IANA "OAuth Dynamic Client Registration Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC7591].
@@ -434,6 +454,7 @@ Specification Document(s):
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
    * Update to comply with draft-ietf-oauth-jwsreq-22
    * Added support for pushed authorization requests only feature
+   * Added support for request objects only feature
 
    -01
    
