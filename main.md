@@ -118,8 +118,8 @@ The AS responds with a request URI,
 which is used by the client in the subsequent authorization request as follows,
 
 ```
-  GET /authorize?request_uri=
-    urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  GET /authorize?client_id=s6BhdRkqt3&
+  request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
@@ -295,14 +295,12 @@ If the signature validation fails, the authorization server returns a `401 Unaut
 
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server as the authorization request parameter `request_uri` as defined in JAR.
+The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example.
 
 ```
-  GET /authorize?request_uri=
-    urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  GET /authorize?client_id=s6BhdRkqt3&
+  request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
-
-Clients are encouraged to use the request URI as the only parameter in order to use the integrity and authenticity provided by the pushed authorization request.
 
 # Authorization Server Metadata
 
@@ -400,6 +398,7 @@ Specification Document(s):
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
+   * update to comply with draft-ietf-oauth-jwsreq-21
 
    -01
    
