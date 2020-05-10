@@ -147,6 +147,8 @@ This specification uses the terms "access token", "refresh token",
 
 The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
 
+If the authorization server has a pushed authorization request endpoint, it SHOULD include the `pushed_authorization_request_endpoint` Server Metadata parameter as defined in (#server_metadata) in its discovery responses.
+
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC].
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
@@ -254,7 +256,6 @@ The following is an example of an error response from the pushed authorization r
   }
 ```
 
-
 # "request" Parameter {#request_parameter}
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@I-D.ietf-oauth-mtls] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
@@ -293,7 +294,7 @@ This section gives the error responses that go beyond the basic (#error_response
 ### Authentication Required
 If the signature validation fails, the authorization server returns a `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
 
-# Authorization Request
+# Authorization Request {#authz_request}
 
 The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example.
 
@@ -302,11 +303,12 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-# Authorization Server Metadata
+# Error Authorization Response  
+An authorization server MAY decide to support pushed authorization requests as the only means for clients to pass authorization request data. In this case, the authorization server will refuse to process any authorization request not fulfilling the requirements as define in (#authz_request) and return an error `invalid_request`.
 
-If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
+The same error code is returned if the client's policy requires use of pushed authorization requests.
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
+Note: authorization server and clients MAY use metadata as defined in (#iana_considerations) to signal the desired behavior.
 
 # Security Considerations
 
@@ -340,8 +342,10 @@ Takahiko Kawasaki
 
 # IANA Considerations {#iana_considerations}
 
-## 
+## OAuth Authorization Server Metadata {#server_metadata}
 This specification requests registration of the following value in the IANA "OAuth Authorization Server Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC8414]. 
+
+### Registry Contents
 
 {spacing="compact"}
 Metadata Name:
@@ -356,6 +360,36 @@ Change Controller:
 Specification Document(s):
 : [[ this document ]]
 
+Metadata Name:
+: `require_pushed_authorization_requests`
+
+Metadata Description:
+: Boolean parameter indicating whether the authorization server accepts pushed authorization request only at the authorization endpoint. The default is `false`. 
+ 
+Change Controller:
+: IESG
+
+Specification Document(s):
+: [[ this document ]]
+
+## OAuth Dynamic Client Registration Metadata
+
+This specification requests registration of the following value in the IANA "OAuth Dynamic Client Registration Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC7591].
+
+### Registry Contents
+
+{spacing="compact"}
+Metadata Name:
+: `require_pushed_authorization_requests`
+
+Metadata Description:
+: Boolean parameter indicating whether the client requires the authorization server to accept pushed authorization request from this client only. 
+ 
+Change Controller:
+: IESG
+
+Specification Document(s):
+: [[ this document ]]
 
 <reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
   <front>
@@ -398,7 +432,8 @@ Specification Document(s):
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
-   * update to comply with draft-ietf-oauth-jwsreq-21
+   * Update to comply with draft-ietf-oauth-jwsreq-22
+   * Added support for pushed authorization requests only feature
 
    -01
    
