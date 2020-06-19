@@ -333,6 +333,10 @@ conducted at the Financial-grade API working group at the OpenID Foundation. We 
 We would like to thank
 Vladimir Dzhuvinov,
 Aaron Parecki,
+Justin Richer,
+Sascha Preibisch,
+Daniel Fett,
+Michael B. Jones,
 Joseph Heenan,
 and
 Takahiko Kawasaki
