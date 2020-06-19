@@ -147,7 +147,9 @@ This specification uses the terms "access token", "refresh token",
 
 The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
 
-The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC].
+Authorization servers supporting pushed authorization requests SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
+
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint also supports sending all authorization request parameters as request object according to [@!I-D.ietf-oauth-jwsreq].
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
@@ -302,11 +304,12 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-# Authorization Server Metadata
+# Authorization Server Metadata {#as_metadata}
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
+`pushed_authorization_request_endpoint`
+: The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
 
 # Security Considerations
 
@@ -354,7 +357,7 @@ Change Controller:
 : IESG
 
 Specification Document(s):
-: [[ this document ]]
+: (#as_metadata) of [[ this document ]]
 
 
 <reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
