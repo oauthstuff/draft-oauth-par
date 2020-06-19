@@ -200,14 +200,14 @@ are managed by some authority (CA or other type), the explicit client registrati
 makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs),
 for example in Open Banking, where the certificate is provided as part of a federated PKI.
 
-## Successful Response
+## Successful Response {#par-response}
 
 If the verification is successful, the server MUST generate a request URI and return a JSON response that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
 
 * `request_uri` : The request URI corresponding to the authorization request posted. This URI is used as reference to the respective request data in the subsequent authorization request only. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.
 * `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS.
 
-The `request_uri` value MUST be generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value.
+The format of the `request_uri` value is at the discretion of the authorization server but it MUST contain some part generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value. The authorization server may construct the `request_uri` value using the form `urn:ietf:params:oauth:request_uri:<reference-value>` with `<reference-value>` as the random part of the URI that references the respective authorization request data. The string representation of a UUID as a URN per [@RFC4122] is also an option for authorization servers to construct `request_uri` values. 
 
 The `request_uri` MUST be bound to the client that posted the authorization request.
 
@@ -221,7 +221,8 @@ The following is an example of such a response:
   Cache-Control: no-cache, no-store
 
   {
-    "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
+    "request_uri": 
+      "urn:ietf:params:oauth:request_uri:bwc4JK-ESC0w8acc191e-Y1LTC2",
     "expires_in": 3600
   }
 ```
@@ -298,8 +299,8 @@ If the signature validation fails, the authorization server returns a `401 Unaut
 The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example.
 
 ```
-  GET /authorize?client_id=s6BhdRkqt3&
-  request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
+  %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
 # Authorization Server Metadata
@@ -357,6 +358,26 @@ Specification Document(s):
 : [[ this document ]]
 
 
+
+## OAuth URI Registration
+
+This specification requests registration of the following value in the "OAuth URI" registry of [@IANA.OAuth.Parameters] established by [@RFC6755].
+
+{spacing="compact"}
+URN:
+: `urn:ietf:params:oauth:request_uri:`
+
+Common Name:
+: A URN Sub-Namespace for OAuth Request URIs.
+
+Change Controller:
+: IESG
+
+Specification Document(s):
+: (#par-response) of [[ this document ]]
+
+
+
 <reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
   <front>
     <title>OpenID Connect Core 1.0 incorporating errata set 1</title>
@@ -399,6 +420,7 @@ Specification Document(s):
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
    * update to comply with draft-ietf-oauth-jwsreq-21, which requires `client_id` in the authorization request in addition to the `request_uri`
+   * Add some guidance/options on the request URI structure
 
    -01
    
