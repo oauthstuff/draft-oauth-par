@@ -398,7 +398,7 @@ Specification Document(s):
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
-   * update to comply with draft-ietf-oauth-jwsreq-21, which requires client_id in the authorization request in addition to the request_uri
+   * update to comply with draft-ietf-oauth-jwsreq-21, which requires `client_id` in the authorization request in addition to the `request_uri`
 
    -01
    
