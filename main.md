@@ -191,7 +191,7 @@ The AS MUST process the request as follows:
 
 1. The AS MUST authenticate the client in the same way as at the token endpoint.
 2. The AS MUST reject the request if the `request_uri` authorization request parameter is provided.
-3. The AS MUST validate the request in the same way as at the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client. It MUST also check whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
+3. The AS MUST validate the pushed request as it would an authorization request sent to the authorization endpoint, however the AS MAY omit validation steps that it is unable to perform when processing the pushed request. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the `scope` for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early.
 
 The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed.
 
@@ -302,6 +302,11 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
+The authorization server MUST validate authorization requests arising from a pushed request as
+it would any other authorization request. The authorization server MAY omit validation steps
+that it performed when the request was pushed, provided that it can validate
+that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
+
 # Authorization Server Metadata
 
 If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
@@ -404,6 +409,7 @@ Specification Document(s):
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
    * update to comply with draft-ietf-oauth-jwsreq-21, which requires `client_id` in the authorization request in addition to the `request_uri`
+   * Clarified timing of request validation
 
    -01
    
