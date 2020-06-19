@@ -302,10 +302,7 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-The authorization server MUST validate authorization requests arising from a pushed request as
-it would any other authorization request. The authorization server MAY omit validation steps
-that it performed when the request was pushed, provided that it can validate
-that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
+The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
 
 # Authorization Server Metadata
 
