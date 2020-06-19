@@ -32,7 +32,7 @@ organization="Ping Identity"
 initials="N."
 surname="Sakimura"
 fullname="Nat Sakimura"
-organization="Nomura Research Institute"
+organization="NAT.Consulting"
     [author.address]
     email = "nat@sakimura.org"
 
