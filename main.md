@@ -304,9 +304,7 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-Authorization server policy MAY dictate that pushed authorization requests are the only means for clients to pass authorization request data. In this case, the authorization server will refuse, using the `invalid_request` error code, to process any request to the authorization endpoint that does not have a `request_uri` parameter with a value obtained from the pushed authorization request endpoint.
-
-The same error code is returned if the client's policy requires use of pushed authorization requests.
+Authorization server policy MAY dictate, either globally or on a per-client basis, that pushed authorization requests are the only means for a client to pass authorization request data. In this case, the authorization server will refuse, using the `invalid_request` error code, to process any request to the authorization endpoint that does not have a `request_uri` parameter with a value obtained from the pushed authorization request endpoint.
 
 Note: authorization server and clients MAY use metadata as defined in (#as_metadata) and (#c_metadata) to signal the desired behavior.
 
