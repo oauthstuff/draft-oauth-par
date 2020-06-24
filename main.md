@@ -32,7 +32,7 @@ organization="Ping Identity"
 initials="N."
 surname="Sakimura"
 fullname="Nat Sakimura"
-organization="Nomura Research Institute"
+organization="NAT.Consulting"
     [author.address]
     email = "nat@sakimura.org"
 
@@ -289,6 +289,46 @@ The AS needs to take the following steps beyond the processing rules defined in 
 1. The AS validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
 1. If the client is a confidential client, the authorization server MUST check whether the authenticated `client_id` matches the `client_id` claim in the request object. If they do not match, the authorization server MUST refuse to process the request. It is at the authorization server's discretion to require the `iss` claim to match the `client_id` as well.
 
+The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (line wraps within values for display purposes only):
+
+```
+ {
+   "kty": "RSA",
+   "kid":"k2bdc",
+   "n": "y9Lqv4fCp6Ei-u2-ZCKq83YvbFEk6JMs_pSj76eMkddWRuWX2aBKGHAtKlE
+         5P7_vn__PCKZWePt3vGkB6ePgzAFu08NmKemwE5bQI0e6kIChtt_6KzT5Oa
+         aXDFI6qCLJmk51Cc4VYFaxgqevMncYrzaW_50mZ1yGSFIQzLYP8bijAHGVj
+         dEFgZaZEN9lsn_GdWLaJpHrB3ROlS50E45wxrlg9xMncVb8qDPuXZarvghL
+         L0HzOuYRadBJVoWZowDNTpKpk2RklZ7QaBO7XDv3uR7s_sf2g-bAjSYxYUG
+         sqkNA9b3xVW53am_UZZ3tZbFTIh557JICWKHlWj5uzeJXaw",
+   "e": "AQAB",
+   "d": "LNwG_pCKrwowALpCpRdcOKlSVqylSurZhE6CpkRiE9cpDgGKIkO9CxPlXOL
+         zjqxXuQc8MdMqRQZTnAwgd7HH0B6gncrruV3NewI-XQV0ckldTjqNfOTz1V
+         Rs-jE-57KAXI3YBIhu-_0YpIDzdk_wBuAk661Svn0GsPQe7m9DoxdzenQu9
+         O_soewUhlPzRrTH0EeIqYI715rwI3TYaSzoWBmEPD2fICyj18FF0MPy_SQz
+         k3noVUUIzfzLnnJiWy_p63QBCMqjRoSHHdMnI4z9iVpIwJWQ3jO5n_2lC2-
+         cSgwjmKsFzDBbQNJc7qMG1N6EssJUwgGJxz1eAUFf0w4YAQ",
+   "qi": "J-mG0swR4FTy3atrcQ7dd0hhYn1E9QndN-
+         -sDG4EQO0RnFj6wIefCvwIc4
+         7hCtVeFnCTPYJNc_JyV-mU-9vlzS5GSNuyR5qdpsMZXUMpEvQcwKt23ffPZ
+         YGaqfKyEesmf_Wi8fFcE68H9REQjnniKrXm7w2-IuG_IrVJA9Ox-uU",
+   "q": "4hlMYAGa0dvogdK1jnxQ7J_Lqpqi99e-AeoFvoYpMPhthChTzwFZO9lQmUo
+         BpMqVQTws_s7vWGmt7ZAB3ywkurf0pV7BD0fweJiUzrWk4KJjxtmP_auuxr
+         jvm3s2FUGn6f0wRY9Z8Hj9A7C72DnYCjuZiJQMYCWDsZ8-d-L1a-s",
+   "p": "5sd9Er3I2FFT9R-gy84_oakEyCmgw036B_nfYEEOCwpSvi2z7UcIVK3bSEL
+         5WCW6BNgB3HDWhq8aYPirwQnqm0K9mX1E-4xM10WWZ-rP3XjYpQeS0Snru5
+         LFVWsAzi-FX7BOqBibSAXLdEGXcXa44l08iec_bPD3xduq5V_1YoE",
+   "dq": "Nz2PF3XM6bEc4XsluKZO70ErdYdKgdtIJReUR7Rno_tOZpejwlPGBYVW19
+         zpAeYtCT82jxroB2XqhLxGeMxEPQpsz2qTKLSe4BgHY2ml2uxSDGdjcsrbb
+         NoKUKaN1CuyZszhWl1n0AT_bENl4bJgQj_Fh0UEsQj5YBBUJt5gr_k",
+   "dp": "Zc877jirkkLOtyTs2vxyNe9KnMNAmOidlUc2tE_-0gAL4Lpo1hSwKCtKwe
+         ZJ-gkqt1hT-dwNx_0Xtg_-NXsadMRMwJnzBMYwYAfjApUkfqABc0yUCJJl3
+         KozRCugf1WXkU9GZAH2_x8PUopdNUEa70ISowPRh04HANKX4fkjWAE"
+  }
+```
+   
+   
+
 ## Error responses for Request Object
 This section gives the error responses that go beyond the basic (#error_response).
 
@@ -350,6 +390,11 @@ conducted at the Financial-grade API working group at the OpenID Foundation. We 
 We would like to thank
 Vladimir Dzhuvinov,
 Aaron Parecki,
+Justin Richer,
+Sascha Preibisch,
+Daniel Fett,
+Michael B. Jones,
+Annabelle Backman,
 Joseph Heenan,
 and
 Takahiko Kawasaki
@@ -449,8 +494,9 @@ Specification Document(s):
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
-   * update to comply with draft-ietf-oauth-jwsreq-21, which requires client_id in the authorization request in addition to the request_uri
    * Added metadata in support of pushed authorization requests only feature
+   * update to comply with draft-ietf-oauth-jwsreq-21, which requires `client_id` in the authorization request in addition to the `request_uri`
+   * Add the key used in the request object example so that a reader could validate or recreate the request object signature
 
    -01
    
