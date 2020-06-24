@@ -147,7 +147,9 @@ This specification uses the terms "access token", "refresh token",
 
 The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
 
-The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC].
+Authorization servers supporting pushed authorization requests SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
+
+The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint also supports sending all authorization request parameters as request object according to [@!I-D.ietf-oauth-jwsreq].
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
@@ -342,11 +344,26 @@ The client uses the `request_uri` value returned by the authorization server to 
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
 ```
 
-# Authorization Server Metadata
+Authorization server policy MAY dictate, either globally or on a per-client basis, that pushed authorization requests are the only means for a client to pass authorization request data. In this case, the authorization server will refuse, using the `invalid_request` error code, to process any request to the authorization endpoint that does not have a `request_uri` parameter with a value obtained from the pushed authorization request endpoint.
 
-If the authorization server has a pushed authorization request endpoint, it SHOULD include the following OAuth/OpenID Provider Metadata parameter in discovery responses:
+Note: authorization server and clients MAY use metadata as defined in (#as_metadata) and (#c_metadata) to signal the desired behavior.
 
-`pushed_authorization_request_endpoint` : The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
+# Authorization Server Metadata {#as_metadata}
+
+The following authorization server metadata [@!RFC8414] parameters are introduced to signal the server's capability and policy with respect to pushed authorization requests.
+
+`pushed_authorization_request_endpoint`
+: The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
+
+`require_pushed_authorization_requests`
+: Boolean parameter indicating whether the authorization server accepts authorization request data only via the pushed authorization request method. If omitted, the default value is `false`. 
+
+# Client Metadata {#c_metadata}
+
+The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamically registering OAuth 2.0 client metadata with authorization servers. The metadata defined by [RFC7591], and registered extensions to it, also imply a general data model for clients that is useful for authorization server implementations even when the Dynamic Client Registration Protocol isn't in play. Such implementations will typically have some sort of user interface available for managing client configuration. The following client metadata parameter is introduced by this document to indicate whether pushed authorization requests are reqired for the given client. 
+
+`require_pushed_authorization_requests`
+: Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is a pushed authorization request.
 
 # Security Considerations
 
@@ -385,8 +402,9 @@ Takahiko Kawasaki
 
 # IANA Considerations {#iana_considerations}
 
-## 
-This specification requests registration of the following value in the IANA "OAuth Authorization Server Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC8414]. 
+## OAuth Authorization Server Metadata
+
+This specification requests registration of the following values in the IANA "OAuth Authorization Server Metadata" registry of [@IANA.OAuth.Parameters] established by [@!RFC8414]. 
 
 {spacing="compact"}
 Metadata Name:
@@ -399,7 +417,40 @@ Change Controller:
 : IESG
 
 Specification Document(s):
-: [[ this document ]]
+: (#as_metadata) of [[ this document ]]
+
+\ 
+: \ 
+
+Metadata Name:
+: `require_pushed_authorization_requests`
+
+Metadata Description:
+: Indicates whether the authorization server accepts authorization request only via the pushed authorization request method. 
+
+Change Controller:
+: IESG
+
+Specification Document(s):
+: (#as_metadata) of [[ this document ]]
+
+
+## OAuth Dynamic Client Registration Metadata
+
+This specification requests registration of the following value in the IANA "OAuth Dynamic Client Registration Metadata" registry of [@IANA.OAuth.Parameters] established by [@RFC7591].
+
+{spacing="compact"}
+Metadata Name:
+: `require_pushed_authorization_requests`
+
+Metadata Description:
+: Indicates whether the client is required to use the pushed authorization request method to initiate authorization requests.
+
+Change Controller:
+: IESG
+
+Specification Document(s):
+: (#c_metadata) of [[ this document ]]
 
 
 <reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
@@ -443,6 +494,7 @@ Specification Document(s):
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
+   * Added metadata in support of pushed authorization requests only feature
    * update to comply with draft-ietf-oauth-jwsreq-21, which requires `client_id` in the authorization request in addition to the `request_uri`
    * Add the key used in the request object example so that a reader could validate or recreate the request object signature
 
