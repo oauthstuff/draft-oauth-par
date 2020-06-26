@@ -225,7 +225,7 @@ The following is an example of such a response:
   {
     "request_uri": 
       "urn:ietf:params:oauth:request_uri:bwc4JK-ESC0w8acc191e-Y1LTC2",
-    "expires_in": 3600
+    "expires_in": 60
   }
 ```
 
