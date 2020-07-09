@@ -235,7 +235,7 @@ For an error the authorization server sets an appropriate HTTP status code and M
 
 If the authorization server sets an error code, it SHOULD be one of the defined codes for the token endpoint in Section 5.2 or for the authorization endpoint in Sections 4.1.2.1 and 4.2.2.1 of [@!RFC6749], or by an OAuth extension if one is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorisation request doesn't involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are not returned.
 
-If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], sections 9.2 and 9.3), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
+If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
 In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes:
 
@@ -523,7 +523,7 @@ Specification Document(s):
    * Clarified timing of request validation
    * Add some guidance/options on the request URI structure
    * Add the key used in the request object example so that a reader could validate or recreate the request object signature
-   * Update to draft-ietf-oauth-jwsreq-25 and added not regarding `require_signed_request_object`
+   * Update to draft-ietf-oauth-jwsreq-25 and added note regarding `require_signed_request_object`
 
    -01
    
