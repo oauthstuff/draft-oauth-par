@@ -8,7 +8,7 @@ keyword = ["security", "oauth2"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-ietf-oauth-par-02"
+value = "draft-ietf-oauth-par-03"
 stream = "IETF"
 status = "standard"
 
@@ -515,6 +515,8 @@ Specification Document(s):
 
    [[ To be removed from the final specification ]]
 
+   -03
+   
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
