@@ -519,6 +519,7 @@ Specification Document(s):
    -03
    
    * Editorial updates
+   * Mention that https is required for the PAR endpoint
 
    -02
 
