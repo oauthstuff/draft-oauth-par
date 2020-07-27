@@ -518,6 +518,8 @@ Specification Document(s):
 
    -03
    
+   * Editorial updates
+
    -02
 
    * Update Resource Indicators reference to the somewhat recently published RFC 8707
