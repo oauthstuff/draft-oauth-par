@@ -522,6 +522,7 @@ Specification Document(s):
    
    * Editorial updates
    * Mention that https is required for the PAR endpoint
+   * Add some discussion of browser form posting an authz request and the benefits of PAR for any application
 
    -02
 
