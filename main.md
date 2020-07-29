@@ -521,7 +521,7 @@ Specification Document(s):
    * Editorial updates
    * Mention that https is required for the PAR endpoint
    * Add some discussion of browser form posting an authz request and the benefits of PAR for any application
-   * Added text about motivations behind PAR
+   * Added text about motivations behind PAR integrity, confidentiality and early client auth
    * Better explain one-time use recommendation of the request_uri
 
    -02
