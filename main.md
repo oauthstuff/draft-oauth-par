@@ -330,13 +330,6 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
 ```
    
    
-
-## Error responses for Request Object
-This section gives the error responses that go beyond the basic (#error_response).
-
-### Authentication Required
-If the signature validation fails, the authorization server returns a `401 Unauthorized` HTTP error response. The same applies if the `client_id` or, if applicable, the `iss` claim in the request object do not match the authenticated `client_id`.
-
 # Authorization Request
 
 The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example.
@@ -401,6 +394,7 @@ Michael B. Jones,
 Annabelle Backman,
 Joseph Heenan,
 Sean Glencross,
+Maggie Hung,
 and
 Takahiko Kawasaki
     for their valuable feedback on this draft.
@@ -523,6 +517,7 @@ Specification Document(s):
    * Add some discussion of browser form posting an authz request and the benefits of PAR for any application
    * Added text about motivations behind PAR integrity, confidentiality and early client auth
    * Better explain one-time use recommendation of the request_uri
+   * Drop the section on special error responses for request objects
 
    -02
 
