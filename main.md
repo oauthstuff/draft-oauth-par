@@ -67,13 +67,11 @@ with a request URI that is used as reference to the data in a subsequent authori
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* There is no cryptographic integrity and authenticity protection, i.e. the request can be modified on its way through the user-agent and attackers can impersonate legitimate clients.
-* There is no mechanism to ensure confidentiality of the request parameters.
-* Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data.
+* There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the ACR value requested by the client or swap the context of a payment transaction authorization by changing scope values. Although clients should detect such changes by inspecting the token response data, preventing such modifications early in the process would be a better solution.
+* There is no mechanism to ensure confidentiality of the request parameters. This obviously is an issue if personal identifiable information is sent in the authorization request, which might be the case in identity and open banking scenarios.
+* Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
-JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for those challenges by allowing OAuth clients to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token (JWT), the so-called "Request Object".
-
-In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
+JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token (JWT), the so-called "Request Object". In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
 
 This document complements JAR by providing an interoperable way to push the payload of a request object directly to the AS in exchange for a `request_uri`.
 
@@ -215,7 +213,7 @@ The format of the `request_uri` value is at the discretion of the authorization 
 
 The `request_uri` MUST be bound to the client that posted the authorization request.
 
-Since the request URI can be replayed, its lifetime SHOULD be short and preferably limited to one-time use.
+Since parts of the request content, e.g. the `code_challenge` parameter value, is unique to a certain authorization request, a `request_uri` should be limited to one-time use.
 
 The following is an example of such a response:
 
