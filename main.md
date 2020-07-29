@@ -207,7 +207,7 @@ for example in Open Banking, where the certificate is provided as part of a fede
 If the verification is successful, the server MUST generate a request URI and return a JSON response that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
 
 * `request_uri` : The request URI corresponding to the authorization request posted. This URI is used as reference to the respective request data in the subsequent authorization request only. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.
-* `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS.
+* `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS and will typically be relatively short.
 
 The format of the `request_uri` value is at the discretion of the authorization server but it MUST contain some part generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value. The authorization server MAY construct the `request_uri` value using the form `urn:ietf:params:oauth:request_uri:<reference-value>` with `<reference-value>` as the random part of the URI that references the respective authorization request data. The string representation of a UUID as a URN per [@RFC4122] is also an option for authorization servers to construct `request_uri` values. 
 
