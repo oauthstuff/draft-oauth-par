@@ -124,10 +124,12 @@ which is used by the client in the subsequent authorization request as follows,
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for an integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
-As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before.
+As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof confidential clients early in the process. 
 
 This is directly utilized by this draft to allow confidential clients to set the redirect URI for
 every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
+
+Note: Form POST requests to the authorization endpoint could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tabs with an URL that is transleted into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the AS. PAR is simpler to use and has additional security benefits as described above. 
 
 ## Conventions and Terminology
 
