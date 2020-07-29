@@ -213,7 +213,7 @@ The format of the `request_uri` value is at the discretion of the authorization 
 
 The `request_uri` MUST be bound to the client that posted the authorization request.
 
-Since parts of the request content, e.g. the `code_challenge` parameter value, is unique to a certain authorization request, a `request_uri` should be limited to one-time use.
+Since parts of the request content, e.g. the `code_challenge` parameter value, is unique to a certain authorization request, a `request_uri` SHOULD be limited to one-time use.
 
 The following is an example of such a response:
 
