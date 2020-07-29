@@ -145,7 +145,7 @@ This specification uses the terms "access token", "refresh token",
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749].
+The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The pushed authorization request endpoint URL MUST use the "https" scheme.
 
 Authorization servers supporting pushed authorization requests SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
 
@@ -519,6 +519,7 @@ Specification Document(s):
    -03
    
    * Editorial updates
+   * Mention that https is required for the PAR endpoint
 
    -02
 
