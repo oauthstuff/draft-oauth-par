@@ -118,6 +118,7 @@ which is used by the client in the subsequent authorization request as follows,
 ```
   GET /authorize?client_id=s6BhdRkqt3&
   request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  Host: as.example.com
 ```
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for a confidential and integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
@@ -337,6 +338,7 @@ The client uses the `request_uri` value returned by the authorization server to 
 ```
   GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
   %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  Host: as.example.com
 ```
 
 The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
