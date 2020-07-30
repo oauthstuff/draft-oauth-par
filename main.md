@@ -237,7 +237,7 @@ If the authorization server sets an error code, it SHOULD be one of the defined 
 
 If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
-In addition to the error codes above, the pushed authorization request endpoint specifies use of the following HTTP status codes:
+In addition to the error codes above, the pushed authorization request endpoint can also make use of the following HTTP status codes:
 
 * 405: If the request did not use POST, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
 
