@@ -204,7 +204,7 @@ for example in Open Banking, where the certificate is provided as part of a fede
 
 ## Successful Response {#par-response}
 
-If the verification is successful, the server MUST generate a request URI and return a JSON response that contains `request_uri` and `expires_in` members at the top level with `201 Created` HTTP response code.
+If the verification is successful, the server MUST generate a request URI and return a JSON response with the following members at the top level with `201 Created` HTTP response code.
 
 * `request_uri` : The request URI corresponding to the authorization request posted. This URI is used as reference to the respective request data in the subsequent authorization request only. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.
 * `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS and will typically be relatively short.
