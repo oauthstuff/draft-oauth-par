@@ -127,7 +127,7 @@ As a further benefit, the pushed authorization request allows the AS to authenti
 This is directly utilized by this draft to allow confidential clients to set the redirect URI for
 every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
 
-Note: Form POST requests to the authorization endpoint could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tabs with an URL that is transleted into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the AS. PAR is simpler to use and has additional security benefits as described above. 
+Note: Form POST requests to the authorization endpoint could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is transleted into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the AS. PAR is simpler to use and has additional security benefits as described above. 
 
 ## Conventions and Terminology
 
