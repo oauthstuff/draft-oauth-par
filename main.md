@@ -77,7 +77,7 @@ This document complements JAR by providing an interoperable way to push the payl
 
 It also allows for clients to push the form encoded authorization request parameters to the AS in order to exchange them for a request URI that the client can use in a subsequent authorization request.
 
-For example, the following authorization request,
+For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following:
 
 ```
   GET /authorize?response_type=code
@@ -86,7 +86,7 @@ For example, the following authorization request,
   Host: as.example.com
 ```
 
-could be pushed directly to the AS by the client as follows:
+Such a request could instead be pushed directly to the authorization server by the client as follows:
 
 ```
   POST /as/par HTTP/1.1
@@ -99,7 +99,7 @@ could be pushed directly to the AS by the client as follows:
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
 
-The AS responds with a request URI,  
+The authorization server responds with a request URI:  
 
 ```
   HTTP/1.1 201 Created
@@ -113,7 +113,7 @@ The AS responds with a request URI,
   }
 ```
 
-which is used by the client in the subsequent authorization request as follows,
+The client uses the request URI value to create the subsequent authorization request and directing the user-agent to make an HTTP request like the following:
 
 ```
   GET /authorize?client_id=s6BhdRkqt3&
@@ -333,8 +333,7 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
    
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example.
-
+The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user-agent to make the following HTTP request:
 ```
   GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
   %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
@@ -516,10 +515,11 @@ Specification Document(s):
    
    * Editorial updates
    * Mention that https is required for the PAR endpoint
-   * Add some discussion of browser form posting an authz request and the benefits of PAR for any application
-   * Added text about motivations behind PAR integrity, confidentiality and early client auth
+   * Add some discussion of browser form posting an authz request vs. the benefits of PAR for any application
+   * Added text about motivations behind PAR - integrity, confidentiality and early client auth
    * Better explain one-time use recommendation of the request_uri
    * Drop the section on special error responses for request objects
+   * Clarify authorization request examples to say that the client directs the user-agent to make the HTTP GET request (vs. making the request itself)
 
    -02
 
