@@ -73,9 +73,9 @@ parameters via redirection in the user-agent. This is simple but also yields cha
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token (JWT), the so-called "Request Object". In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
 
-This document complements JAR by providing an interoperable way to push the payload of a request object directly to the AS in exchange for a `request_uri`.
+This document complements JAR by providing an interoperable way to push the payload of a request object directly to the authorization server in exchange for a `request_uri`.
 
-It also allows for clients to push the form encoded authorization request parameters to the AS in order to exchange them for a request URI that the client can use in a subsequent authorization request.
+It also allows for clients to push the form encoded authorization request parameters to the authorization server in order to exchange them for a request URI that the client can use in a subsequent authorization request.
 
 For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following:
 
@@ -123,12 +123,12 @@ The client uses the request URI value to create the subsequent authorization req
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for a confidential and integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
-As a further benefit, the pushed authorization request allows the AS to authenticate the clients before any user interaction happens, i.e., the AS may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof confidential clients early in the process. 
+As a further benefit, the pushed authorization request allows the authorization server to authenticate the clients before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof confidential clients early in the process. 
 
 This is directly utilized by this draft to allow confidential clients to set the redirect URI for
-every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular AS could practically be skipped.
+every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular authorization server could practically be skipped.
 
-Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is transleted into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the AS. PAR is simpler to use and has additional security benefits as described above. 
+Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the authorization server. PAR is simpler to use and has additional security benefits as described above. 
 
 ## Conventions and Terminology
 
@@ -155,7 +155,7 @@ The endpoint accepts the parameters defined in [@!RFC6749] for the authorization
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
 Note that there's some potential ambiguity around the appropriate audience
-value to use when JWT client assertion based authentication is employed. To address that ambiguity the issuer identifier URL of the AS according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the AS MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
+value to use when JWT client assertion based authentication is employed. To address that ambiguity the issuer identifier URL of the authorization server according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the authorization server MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
 
 ## Request {#request}
 
@@ -190,17 +190,17 @@ This is illustrated by the following example:
   scope=ais
 ```
 
-The AS MUST process the request as follows:
+The authorization server MUST process the request as follows:
 
-1. The AS MUST authenticate the client in the same way as at the token endpoint.
-2. The AS MUST reject the request if the `request_uri` authorization request parameter is provided.
-3. The AS MUST validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The AS MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
+1. Authenticate the client in the same way as at the token endpoint.
+2. Reject the request if the `request_uri` authorization request parameter is provided.
+3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
 
-The AS MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the AS the ability to authenticate and authorize clients before the actual authorization request is performed.
+The authorization server MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the ability to authenticate and authorize clients before the actual authorization request is performed.
 
 This feature gives clients more flexibility in building redirect URIs and, if the client IDs and credentials
-are managed by some authority (CA or other type), the explicit client registration with the particular AS (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
-makes this mechanism especially useful for clients interacting with a federation of ASs (or OpenID Connect OPs),
+are managed by some authority (CA or other type), the explicit client registration with the particular authorization server (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
+makes this mechanism especially useful for clients interacting with a federation of authorization servers (or OpenID Connect Providers),
 for example in Open Banking, where the certificate is provided as part of a federated PKI.
 
 ## Successful Response {#par-response}
@@ -208,7 +208,7 @@ for example in Open Banking, where the certificate is provided as part of a fede
 If the verification is successful, the server MUST generate a request URI and return a JSON response with the following members at the top level with `201 Created` HTTP response code.
 
 * `request_uri` : The request URI corresponding to the authorization request posted. This URI is used as reference to the respective request data in the subsequent authorization request only. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.
-* `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the AS and will typically be relatively short.
+* `expires_in` : A JSON number that represents the lifetime of the request URI in seconds. The request URI lifetime is at the discretion of the authorization server and will typically be relatively short.
 
 The format of the `request_uri` value is at the discretion of the authorization server but it MUST contain some part generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value. The authorization server MAY construct the `request_uri` value using the form `urn:ietf:params:oauth:request_uri:<reference-value>` with `<reference-value>` as the random part of the URI that references the respective authorization request data. The string representation of a UUID as a URN per [@RFC4122] is also an option for authorization servers to construct `request_uri` values. 
 
@@ -262,7 +262,7 @@ The following is an example of an error response from the pushed authorization r
 
 # "request" Parameter {#request_parameter}
 
-Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the AS. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@I-D.ietf-oauth-mtls] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
+Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@I-D.ietf-oauth-mtls] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
 
 The following is an example of a pushed authorization request using a signed request object. The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749]:
 
@@ -286,10 +286,10 @@ The following is an example of a pushed authorization request using a signed req
   6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
 ```
 
-The AS needs to take the following steps beyond the processing rules defined in (#request):
+The authorization server needs to take the following steps beyond the processing rules defined in (#request):
 
-1. If applicable, the AS decrypts the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
-1. The AS validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
+1. If applicable, decrypt the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
+1. Validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
 1. If the client is a confidential client, the authorization server MUST check whether the authenticated `client_id` matches the `client_id` claim in the request object. If they do not match, the authorization server MUST refuse to process the request. It is at the authorization server's discretion to require the `iss` claim to match the `client_id` as well.
 
 The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (line wraps within values for display purposes only):
@@ -367,18 +367,18 @@ The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamical
 
 ## Request URI Guessing
 An attacker could attempt to guess and replay a valid request URI value and
-try to impersonate the respective client. The AS MUST consider the considerations
-given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause d on request URI entropy.
+try to impersonate the respective client. The authorization server MUST consider the considerations
+given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause (d) on request URI entropy.
 
 ## Open Redirection
-An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The AS MUST only accept new redirect URIs in the PAR request from confidential clients after sucessful authentication and authorization.
+An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or lauch other attacks towards the user. The authorization server MUST only accept new redirect URIs in the PAR request from confidential clients after successful authentication and authorization.
 
 ## Request Object Replay
-An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the AS SHOULD make the request URIs one-time use.
+An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the authorization server SHOULD make the request URIs one-time use.
 
 ## Client Policy Change
 The client policy might change between the lodging of the request object and the
-authorization request using a particular request object. It is therefore recommended that the AS check the request parameter against the client policy when processing the authorization request.
+authorization request using a particular request object. It is therefore recommended that the authorization server check the request parameter against the client policy when processing the authorization request.
 
 # Acknowledgements {#Acknowledgements}
 
