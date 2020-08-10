@@ -514,6 +514,8 @@ Specification Document(s):
 
    -04
 
+   * Replace I-D.ietf-oauth-mtls reference with now published RFC8705
+
    -03
    
    * Editorial updates
