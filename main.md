@@ -125,9 +125,6 @@ The pushed authorization request endpoint fosters OAuth security by providing al
 
 As a further benefit, the pushed authorization request allows the authorization server to authenticate the clients before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof confidential clients early in the process. 
 
-This is directly utilized by this draft to allow confidential clients to set the redirect URI for
-every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular authorization server could practically be skipped.
-
 Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the authorization server. PAR is simpler to use and has additional security benefits as described above. 
 
 ## Conventions and Terminology
@@ -259,6 +256,13 @@ The following is an example of an error response from the pushed authorization r
       "The redirect_uri is not valid for the given client"
   }
 ```
+## redirect_uri Management
+
+The OAuth Security BCP [@!I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@!I-D.ietf-oauth-v2-1] require an AS to excactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means to early detect attempts to impersonate a client and prevent token leakage and open redirection. As a downside, it makes client management more complex since the redirect URI is typically the most volatile part of a client policy. 
+
+This requirement MAY be relaxed by the AS, if a confidential client uses pushed authorization requests since the AS authenticates the client before the authorization process starts and that way ensures it interacts with the legit client. The AS MAY allow such clients to specify `redirect_uri` values not previously registered with the AS. This will give the client more flexibility (e.g. to mint AS-specific redirect URIs on the fly) and makes client management much easier. It is at the discretion of the AS to apply restrictions on `redirect_uri` values, e.g. the AS MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
+
+Note: The aibility to set up transaction specific redirect URIs is also useful in situations where client ids and correspoding credentials and policies are managed by a trusted 3rd party, e.g. via client certifiates containing client permissions. Such an externally managed client could interact with an AS trusting the respective 3rd party without the need for an additional registration step.
 
 # "request" Parameter {#request_parameter}
 
