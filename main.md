@@ -232,7 +232,7 @@ In addition to the error codes above, the pushed authorization request endpoint 
 
 * 413: If the request size was beyond the upper bound that the authorization server allows, the authorization server responds with an HTTP 413 (Payload Too Large) status code.
 
-* 429: If the request from the client for a time period goes beyond the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.
+* 429: If the number of requests from a client during a particular time period exceeds the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.
 
 The following is an example of an error response from the pushed authorization request endpoint:
 
