@@ -125,9 +125,6 @@ The pushed authorization request endpoint fosters OAuth security by providing al
 
 As a further benefit, the pushed authorization request allows the authorization server to authenticate the clients before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof confidential clients early in the process. 
 
-This is directly utilized by this draft to allow confidential clients to set the redirect URI for
-every authorization request, which gives them more flexibility in building redirect URI. And if the client IDs and credentials are managed by some external authority (e.g. a certification authority), explicit client registration with the particular authorization server could practically be skipped.
-
 Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the authorization server. PAR is simpler to use and has additional security benefits as described above. 
 
 ## Conventions and Terminology
@@ -259,6 +256,13 @@ The following is an example of an error response from the pushed authorization r
       "The redirect_uri is not valid for the given client"
   }
 ```
+## redirect_uri Management
+
+While OAuth 2.0 [RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
+
+The exact matching requirement MAY be relaxed by the authorization server for a confidential client using pushed authorization requests since the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g. to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g. the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
+
+Note: The ability to set up transaction specific redirect URIs is also useful in situations where client ids and corresponding credentials and policies are managed by a trusted 3rd party, e.g. via client certificates containing client permissions. Such an externally managed client could interact with an authorization server trusting the respective 3rd party without the need for an additional registration step.
 
 # "request" Parameter {#request_parameter}
 
@@ -516,6 +520,7 @@ Specification Document(s):
    -04
 
    * Replace I-D.ietf-oauth-mtls reference with now published RFC8705
+   * Moved text about redirect URI management from introduction into seperate section
 
    -03
    
