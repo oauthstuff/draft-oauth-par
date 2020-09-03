@@ -256,9 +256,9 @@ The following is an example of an error response from the pushed authorization r
       "The redirect_uri is not valid for the given client"
   }
 ```
-## redirect_uri Management
+## Management of Client Redirect URIs
 
-While OAuth 2.0 [RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
+While OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
 
 The exact matching requirement MAY be relaxed by the authorization server for a confidential client using pushed authorization requests since the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g. to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g. the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
 
@@ -521,7 +521,7 @@ Specification Document(s):
 
    * Edits to address WGLC comments
    * Replace I-D.ietf-oauth-mtls reference with now published RFC8705
-   * Moved text about redirect URI management from introduction into seperate section
+   * Moved text about redirect URI management from introduction into separate section
 
    -03
    
