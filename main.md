@@ -77,16 +77,16 @@ This document complements JAR by providing an interoperable way to push the payl
 
 It also allows for clients to push the form encoded authorization request parameters to the authorization server in order to exchange them for a request URI that the client can use in a subsequent authorization request.
 
-For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following:
+For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?response_type=code
-   &client_id=s6BhdRkqt3&state=af0ifjsldkj
-   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
+    &client_id=s6BhdRkqt3&state=af0ifjsldkj
+    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
   Host: as.example.com
 ```
 
-Such a request could instead be pushed directly to the authorization server by the client as follows:
+Such a request could instead be pushed directly to the authorization server by the client as follows (extra line breaks for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -107,17 +107,16 @@ The authorization server responds with a request URI:
   Content-Type: application/json
 
   {
-
     "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
     "expires_in": 90
   }
 ```
 
-The client uses the request URI value to create the subsequent authorization request and directing the user-agent to make an HTTP request like the following:
+The client uses the request URI value to create the subsequent authorization request and directing the user-agent to make an HTTP request like the following (extra line breaks and indentation for display purposes only):
 
 ```
-  GET /authorize?client_id=s6BhdRkqt3&
-  request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+  GET /authorize?client_id=s6BhdRkqt3
+    &request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
   Host: as.example.com
 ```
 
@@ -170,7 +169,7 @@ Depending on client type and authentication method, the request might also inclu
 
 The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
-This is illustrated by the following example:
+This is illustrated by the following example (extra line breaks in the message-body for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -178,13 +177,10 @@ This is illustrated by the following example:
   Content-Type: application/x-www-form-urlencoded
   Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
 
-  response_type=code&
-  state=af0ifjsldkj&
-  client_id=s6BhdRkqt3&
-  redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&
-  code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U&
-  code_challenge_method=S256&
-  scope=ais
+  response_type=code&state=af0ifjsldkj&client_id=s6BhdRkqt3
+  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+  &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+  &code_challenge_method=S256&scope=ais
 ```
 
 The authorization server MUST process the request as follows:
@@ -263,7 +259,7 @@ Note: The ability to set up transaction specific redirect URIs is also useful in
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
 
-The following is an example of a pushed authorization request using a signed request object. The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749]:
+The following is an example of a pushed authorization request using a signed request object. The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749] (extra line breaks for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -291,7 +287,7 @@ The authorization server MUST take the following steps beyond the processing rul
 1. Validate the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
 1. If the client is a confidential client, reject the request if the authenticated `client_id` does not match the `client_id` claim in the request object.  Additionally requiring the `iss` claim to match the `client_id` is at the discretion of authorization server.
 
-The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (line wraps within values for display purposes only):
+The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (extra line breaks and indentation within values for display purposes only):
 
 ```
  {
@@ -332,10 +328,10 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
    
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user-agent to make the following HTTP request:
+The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user-agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
 ```
   GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
-  %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+    %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
   Host: as.example.com
 ```
 
