@@ -515,6 +515,7 @@ Specification Document(s):
 
    -04
 
+   * Edits to address WGLC comments
    * Replace I-D.ietf-oauth-mtls reference with now published RFC8705
 
    -03
