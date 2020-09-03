@@ -195,11 +195,6 @@ The authorization server MUST process the request as follows:
 
 The authorization server MAY allow confidential clients to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the ability to authenticate and authorize clients before the actual authorization request is performed.
 
-This feature gives clients more flexibility in building redirect URIs and, if the client IDs and credentials
-are managed by some authority (CA or other type), the explicit client registration with the particular authorization server (manually or via dynamic client registration [@RFC7591]) could practically be skipped. This
-makes this mechanism especially useful for clients interacting with a federation of authorization servers (or OpenID Connect Providers),
-for example in Open Banking, where the certificate is provided as part of a federated PKI.
-
 ## Successful Response {#par-response}
 
 If the verification is successful, the server MUST generate a request URI and return a JSON response with the following members at the top level with `201 Created` HTTP response code.
@@ -264,7 +259,7 @@ The exact matching requirement MAY be relaxed by the authorization server for a 
 
 Note: The ability to set up transaction specific redirect URIs is also useful in situations where client ids and corresponding credentials and policies are managed by a trusted 3rd party, e.g. via client certificates containing client permissions. Such an externally managed client could interact with an authorization server trusting the respective 3rd party without the need for an additional registration step.
 
-# "request" Parameter {#request_parameter}
+# The "request" Request Parameter {#request_parameter}
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. When the `application/x-www-form-urlencoded` HTTP entity-body `request` parameter is used, the request object MUST contain all the authorization request parameters as claims of the JWT. Additional request parameters as required by the given client authentication method are to be included as 'application/x-www-form-urlencoded' parameters in the HTTP request entity-body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`).     
 
