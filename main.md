@@ -286,11 +286,11 @@ The following is an example of a pushed authorization request using a signed req
   6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
 ```
 
-The authorization server needs to take the following steps beyond the processing rules defined in (#request):
+The authorization server MUST take the following steps beyond the processing rules defined in (#request):
 
 1. If applicable, decrypt the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
-1. Validates the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
-1. If the client is a confidential client, the authorization server MUST check whether the authenticated `client_id` matches the `client_id` claim in the request object. If they do not match, the authorization server MUST refuse to process the request. It is at the authorization server's discretion to require the `iss` claim to match the `client_id` as well.
+1. Validate the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
+1. If the client is a confidential client, reject the request if the authenticated `client_id` does not match the `client_id` claim in the request object.  Additionally requiring the `iss` claim to match the `client_id` is at the discretion of authorization server.
 
 The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (line wraps within values for display purposes only):
 
@@ -397,6 +397,7 @@ Joseph Heenan,
 Sean Glencross,
 Maggie Hung,
 Neil Madden,
+Karsten Meyer zu Selhausen,
 and
 Takahiko Kawasaki
     for their valuable feedback on this draft.
