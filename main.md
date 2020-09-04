@@ -155,15 +155,7 @@ value to use when JWT client assertion based authentication is employed. To addr
 
 ## Request {#request}
 
-A client can send all the parameters that usually comprise an authorization request to the pushed authorization request endpoint. A basic parameter set will typically include:
-
-* `client_id`
-* `response_type`
-* `redirect_uri`
-* `scope`
-* `state`
-* `code_challenge`
-* `code_challenge_method`
+A client sends the parameters that usually comprise an authorization request directly to the pushed authorization request endpoint. A typical parameter set might include: `client_id`, `response_type`, `redirect_uri`, `scope`, `state`, `code_challenge`, and `code_challenge_method` as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at authorization endpoint including those  defined in [@!RFC6749] as well as all applicable extensions.
 
 Depending on client type and authentication method, the request might also include other parameters for client authentication such as the `client_secret` parameter, the `client_assertion` parameter and the `client_assertion_type` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
 
@@ -180,7 +172,7 @@ This is illustrated by the following example (extra line breaks in the message-b
   response_type=code&state=af0ifjsldkj&client_id=s6BhdRkqt3
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
   &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
-  &code_challenge_method=S256&scope=ais
+  &code_challenge_method=S256&scope=account-information
 ```
 
 The authorization server MUST process the request as follows:
