@@ -346,7 +346,8 @@ The following authorization server metadata [@!RFC8414] parameters are introduce
 The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamically registering OAuth 2.0 client metadata with authorization servers. The metadata defined by [RFC7591], and registered extensions to it, also imply a general data model for clients that is useful for authorization server implementations even when the Dynamic Client Registration Protocol isn't in play. Such implementations will typically have some sort of user interface available for managing client configuration. The following client metadata parameter is introduced by this document to indicate whether pushed authorization requests are reqired for the given client. 
 
 `require_pushed_authorization_requests`
-: Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is a pushed authorization request.
+: Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is a pushed authorization request. If omitted, the default value is `false`.
+
 
 # Security Considerations
 
