@@ -220,13 +220,11 @@ The following is an example of such a response:
 
 ## Error Response {#error_response}
 
-For an error the authorization server sets an appropriate HTTP status code and MAY include additional error parameters in the entity-body of the HTTP response using the format specified for the token endpoint in Section 5.2 of [@!RFC6749].
-
-If the authorization server sets an error code, it SHOULD be one of the defined codes for the token endpoint in Section 5.2 or for the authorization endpoint in Sections 4.1.2.1 and 4.2.2.1 of [@!RFC6749], or by an OAuth extension if one is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorization request doesn't involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are not returned.
+The authorization server returns an error response with the same format as is specified for error responses from the token endpoint in Section 5.2 of [@!RFC6749] using the appropriate error code from therein or from Section 4.1.2.1 of [@!RFC6749].  Error codes defined by OAuth extension can also be used when such an extension is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorization request does not involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are never returned.
 
 If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
-In addition to the error codes above, the pushed authorization request endpoint can also make use of the following HTTP status codes:
+In addition to the above, the pushed authorization request endpoint can also make use of the following HTTP status codes:
 
 * 405: If the request did not use POST, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
 
