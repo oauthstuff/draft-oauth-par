@@ -71,9 +71,9 @@ parameters via redirection in the user-agent. This is simple but also yields cha
 * There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user-agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of which can be significant, if personal identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
-JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a signed, and optionally encrypted, JSON Web Token (JWT), the so-called "Request Object". In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
+JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
 
-This document complements JAR by providing an interoperable way to push the payload of a request object directly to the authorization server in exchange for a `request_uri`.
+This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri`.
 
 It also allows for clients to push the form encoded authorization request parameters to the authorization server in order to exchange them for a request URI that the client can use in a subsequent authorization request.
 
