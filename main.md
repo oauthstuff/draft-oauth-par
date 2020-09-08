@@ -122,7 +122,7 @@ The pushed authorization request endpoint fosters OAuth security by providing al
 
 The pushed authorization request also allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that are capable of authenticating to the authorization server early in the process. 
 
-Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the authorization server. PAR is simpler to use and has additional security benefits as described above. 
+Note that HTTP `POST` requests to the authorization endpoint via the user-agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
 
 ## Conventions and Terminology
 
@@ -140,7 +140,7 @@ This specification uses the terms "access token", "refresh token",
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint is an HTTP API at the authorization server that accepts POST requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The pushed authorization request endpoint URL MUST use the "https" scheme.
+The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP `POST` requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The pushed authorization request endpoint URL MUST use the "https" scheme.
 
 Authorization servers supporting pushed authorization requests SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
 
@@ -157,7 +157,7 @@ A client sends the parameters that usually comprise an authorization request dir
 
 Depending on client type and authentication method, the request might also include other parameters for client authentication such as the `client_secret` parameter, the `client_assertion` parameter and the `client_assertion_type` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
 
-The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP POST request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
+The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP `POST` request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
 
 This is illustrated by the following example (extra line breaks in the message-body for display purposes only):
 
@@ -216,7 +216,7 @@ If the client is required to use signed request objects, either by authorization
 
 In addition to the above, the pushed authorization request endpoint can also make use of the following HTTP status codes:
 
-* 405: If the request did not use POST, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
+* 405: If the request did not use the `POST` method, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
 
 * 413: If the request size was beyond the upper bound that the authorization server allows, the authorization server responds with an HTTP 413 (Payload Too Large) status code.
 
