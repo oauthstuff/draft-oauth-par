@@ -73,9 +73,7 @@ parameters via redirection in the user-agent. This is simple but also yields cha
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
 
-This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri`.
-
-It also allows for clients to push the form encoded authorization request parameters to the authorization server in order to exchange them for a request URI that the client can use in a subsequent authorization request.
+This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri` value usable at the authorization server in a subsequent authorization request.
 
 For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following (extra line breaks and indentation for display purposes only):
 
@@ -122,7 +120,7 @@ The client uses the request URI value to create the subsequent authorization req
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for a confidential and integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
-As a further benefit, the pushed authorization request allows the authorization server to authenticate the clients before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that can authenticate to the authorization server early in the process. 
+The pushed authorization request also allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that are capable of authenticating to the authorization server early in the process. 
 
 Note: HTTP POST requests to the authorization endpoint as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC] could also be used to cope with the request size limitations described above. Although this is a viable option for traditional web applications, it's difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using POST would require the app to first open a web page under its control in the custom tab that in turn would initiate the form POST towards the authorization server. PAR is simpler to use and has additional security benefits as described above. 
 
@@ -336,7 +334,7 @@ Note: authorization server and clients MAY use metadata as defined in (#as_metad
 The following authorization server metadata [@!RFC8414] parameters are introduced to signal the server's capability and policy with respect to pushed authorization requests.
 
 `pushed_authorization_request_endpoint`
-: The URL of the pushed authorization request endpoint at which the client can post an authorization request and get a request URI in exchange.
+: The URL of the pushed authorization request endpoint at which a client can post an authorization request in exchange for a `request_uri` value usable at the authorization server.
 
 `require_pushed_authorization_requests`
 : Boolean parameter indicating whether the authorization server accepts authorization request data only via the pushed authorization request method. If omitted, the default value is `false`. 
