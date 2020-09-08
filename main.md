@@ -148,8 +148,8 @@ The endpoint accepts the parameters defined in [@!RFC6749] for the authorization
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
 
-Note that there's some potential ambiguity around the appropriate audience
-value to use when JWT client assertion based authentication is employed. To address that ambiguity the issuer identifier URL of the authorization server according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the authorization server MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
+Due to historical reasons there is potential ambiguity regarding the appropriate audience
+value to use when employing JWT client assertion based authentication (defined in Section 2.2 of [@RFC7523] with `private_key_jwt` or `client_secret_jwt` authentication method names per Section 9 of [@OIDC]). To address that ambiguity the issuer identifier URL of the authorization server according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the authorization server MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
 
 ## Request {#request}
 
