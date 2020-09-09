@@ -146,18 +146,18 @@ Authorization servers supporting pushed authorization requests SHOULD include th
 
 The endpoint accepts the parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint also supports sending all authorization request parameters as request object according to [@!I-D.ietf-oauth-jwsreq].
 
-The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint.
+The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint. Similarly, the `token_endpoint_auth_methods_supported` authorization server metadata parameter lists client authentication methods supported by the authorization server when accepting direct requests from clients, including requests to the pushed authorization request endpoint.
 
 Due to historical reasons there is potential ambiguity regarding the appropriate audience
 value to use when employing JWT client assertion based authentication (defined in Section 2.2 of [@RFC7523] with `private_key_jwt` or `client_secret_jwt` authentication method names per Section 9 of [@OIDC]). To address that ambiguity the issuer identifier URL of the authorization server according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the authorization server MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
 
 ## Request {#request}
 
-A client sends the parameters that usually comprise an authorization request directly to the pushed authorization request endpoint. A typical parameter set might include: `client_id`, `response_type`, `redirect_uri`, `scope`, `state`, `code_challenge`, and `code_challenge_method` as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at authorization endpoint including those  defined in [@!RFC6749] as well as all applicable extensions.
+A client sends the parameters that comprise an authorization request directly to the pushed authorization request endpoint. A typical parameter set might include: `client_id`, `response_type`, `redirect_uri`, `scope`, `state`, `code_challenge`, and `code_challenge_method` as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at authorization endpoint including those defined in [@!RFC6749] as well as all applicable extensions. The `request_uri` authorization request parameter is one exception, which MUST NOT be provided.
 
-Depending on client type and authentication method, the request might also include other parameters for client authentication such as the `client_secret` parameter, the `client_assertion` parameter and the `client_assertion_type` parameter. The `request_uri` authorization request parameter MUST NOT be provided in this case (see (#request_parameter)).
+The request also includes, as appropriate for the given client, any additional parameters necessary for client authentication (i.e., `client_secret`, or `client_assertion` and `client_assertion_type`). Such parameters are defined and registered for use at the token endpoint but are applicable only for client authentication. When present in a pushed authorization request, they are relied upon only for client authentication and are not germane to the authorization request itself. Any token endpoint parameters that are not related to client authentication have no defined meaning for a pushed authorization request. The `client_id` parameter is defined with the same semantics for both authorization requests and requests to the token endpoint; as a required authorization request parameter, it is similarly required in a pushed authorization request.           
 
-The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP `POST` request. If applicable, the client also adds client credentials to the request header or the request body using the same rules as for token endpoint requests.
+The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP `POST` request. If applicable, the client also adds its authentication credentials to the request header or the request body using the same rules as for token endpoint requests.
 
 This is illustrated by the following example (extra line breaks in the message-body for display purposes only):
 
@@ -190,7 +190,7 @@ If the verification is successful, the server MUST generate a request URI and re
 
 The format of the `request_uri` value is at the discretion of the authorization server but it MUST contain some part generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value. The authorization server MAY construct the `request_uri` value using the form `urn:ietf:params:oauth:request_uri:<reference-value>` with `<reference-value>` as the random part of the URI that references the respective authorization request data. The string representation of a UUID as a URN per [@RFC4122] is also an option for authorization servers to construct `request_uri` values. 
 
-The `request_uri` MUST be bound to the client that posted the authorization request.
+The `request_uri` value MUST be bound to the client that posted the authorization request.
 
 Since parts of the request content, e.g. the `code_challenge` parameter value, is unique to a certain authorization request, a `request_uri` SHOULD be limited to one-time use.
 
@@ -267,6 +267,7 @@ The following is an example of a pushed authorization request using a signed req
   MsRLbmtIvaLYbQH_Ef3UkDLOGiU7exhVFTPeyQUTM9FF-u3K-zX-FO05_brYxNGLh
   VkO1G8MjqQnn2HpAzlBd5179WTzTYhKmhTiwzH-qlBBI_9GLJmE3KOipko9TfSpa2
   6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
+  &client_id=s6BhdRkqt3
 ```
 
 The authorization server MUST take the following steps beyond the processing rules defined in (#request):
