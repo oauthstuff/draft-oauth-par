@@ -120,7 +120,7 @@ The client uses the request URI value to create the subsequent authorization req
 
 The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for a confidential and integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
 
-The pushed authorization request also allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that are capable of authenticating to the authorization server early in the process. 
+The pushed authorization request also allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that are capable of authenticating early in the process. 
 
 Note that HTTP `POST` requests to the authorization endpoint via the user-agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
 
@@ -179,7 +179,7 @@ The authorization server MUST process the request as follows:
 2. Reject the request if the `request_uri` authorization request parameter is provided.
 3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
 
-The authorization server MAY allow clients with authentication credentials to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the the ability to authenticate clients and validate client requests before the actual authorization request is performed.
+The authorization server MAY allow clients with authentication credentials to establish per-authorization request redirect URIs with every pushed authorization request. Described in more detail in (#redirect_uri_mgmt), this is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the the ability to authenticate clients and validate client requests before the actual authorization request is performed. 
 
 ## Successful Response {#par-response}
 
@@ -235,7 +235,7 @@ The following is an example of an error response from the pushed authorization r
       "The redirect_uri is not valid for the given client"
   }
 ```
-## Management of Client Redirect URIs
+## Management of Client Redirect URIs {#redirect_uri_mgmt}
 
 While OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
 
