@@ -179,7 +179,7 @@ The authorization server MUST process the request as follows:
 2. Reject the request if the `request_uri` authorization request parameter is provided.
 3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
 
-The authorization server MAY allow clients with authentication credentials to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the ability to authenticate and authorize clients before the actual authorization request is performed.
+The authorization server MAY allow clients with authentication credentials to establish per-authorization request redirect URIs with every pushed authorization request. This is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the the ability to authenticate clients and validate client requests before the actual authorization request is performed.
 
 ## Successful Response {#par-response}
 
