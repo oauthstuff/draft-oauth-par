@@ -376,6 +376,10 @@ An attacker could replay a request URI captured from a legitimate authorization 
 The client policy might change between the lodging of the request object and the
 authorization request using a particular request object. It is therefore recommended that the authorization server check the request parameter against the client policy when processing the authorization request.
 
+## Request URI Swapping
+
+An attacker could capture the request URI from one request and then substitute it into a different authorization request. For example, in the context of OpenID Connect, an attacker could replace a request URI asking for a high level of authentication assurance with one that requires a lower level of assurance. Clients SHOULD make use of PKCE, a unique `state` parameter, or the OIDC “nonce” parameter in the pushed request object to prevent this attack.
+
 # Privacy Considerations
 
 OAuth 2.0 is a complex and flexible framework with broad ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure due to passing authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request rather than in the query component of a URL that passes through the user-agent in the clear.
