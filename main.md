@@ -192,8 +192,6 @@ The format of the `request_uri` value is at the discretion of the authorization 
 
 The `request_uri` value MUST be bound to the client that posted the authorization request.
 
-Since parts of the request content, e.g. the `code_challenge` parameter value, is unique to a certain authorization request, a `request_uri` SHOULD be limited to one-time use.
-
 The following is an example of such a response:
 
 ```
@@ -323,6 +321,9 @@ The client uses the `request_uri` value returned by the authorization server to 
     %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
   Host: as.example.com
 ```
+
+Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user-agent.
+
 
 The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
 
