@@ -58,7 +58,8 @@ organization="Auth0"
 This document defines the pushed authorization request endpoint, which allows
 clients to push the payload of an OAuth 2.0 authorization request to the
 authorization server via a direct request and provides them
-with a request URI that is used as reference to the data in a subsequent authorization request.
+with a request URI that is used as reference to the data in a
+subsequent call to the authorization endpoint.
 
 {mainmatter}
 
