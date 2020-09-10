@@ -65,10 +65,16 @@ subsequent call to the authorization endpoint.
 
 # Introduction {#Introduction}
 
+Pushed authorization requests (PAR), defined by this document, enable OAuth [@!RFC6749] clients
+to push the payload of an authorization request directly
+to the authorization server in exchange for a request URI value, which is used as reference
+to the authorization request payload data in a subsequent call to the authorization endpoint
+via the user-agent.
+
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
-* There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the scope of access requested or swap the context of a payment transaction authorization by changing scope values. Although protocol facilities exist to enable clients or users to detect some such changes, preventing modifications early in the process is a more robust solution.
+* There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the scope of access requested or swap the context of a payment transaction by changing scope values. Although protocol facilities exist to enable clients or users to detect some such changes, preventing modifications early in the process is a more robust solution.
 * There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user-agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of which can be significant, if personal identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
@@ -76,7 +82,15 @@ JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solut
 
 This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri` value usable at the authorization server in a subsequent authorization request.
 
-For example, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following (extra line breaks and indentation for display purposes only):
+PAR fosters OAuth security by providing clients a simple means for a confidential and integrity protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based request objects in conduction with PAR.
+
+PAR allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity during the authorization process than before. This generally improves security since it prevents attempts to spoof clients, which are capable of authenticating, early in the process. 
+
+Note that HTTP `POST` requests to the authorization endpoint via the user-agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
+
+## Introductory Example
+
+A client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?response_type=code
@@ -85,7 +99,7 @@ For example, a client typically initiates an authorization request by directing 
   Host: as.example.com
 ```
 
-Such a request could instead be pushed directly to the authorization server by the client as follows (extra line breaks for display purposes only):
+Such a request could instead be pushed directly to the authorization server by the client as follows with a `POST` request to the pushed authorization request endpoint (extra line breaks for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -111,19 +125,13 @@ The authorization server responds with a request URI:
   }
 ```
 
-The client uses the request URI value to create the subsequent authorization request and directing the user-agent to make an HTTP request like the following (extra line breaks and indentation for display purposes only):
+The client uses the request URI value to create the subsequent authorization request by directing the user-agent to make an HTTP request to the authorization server's authorization endpoint like the following (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?client_id=s6BhdRkqt3
     &request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
   Host: as.example.com
 ```
-
-The pushed authorization request endpoint fosters OAuth security by providing all clients a simple means for a confidential and integrity protected authorization request, but it also allows clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, to explicitly adopt JWT-based request objects.
-
-The pushed authorization request also allows the authorization server to authenticate the client before any user interaction happens, i.e., the authorization server may refuse unauthorized requests much earlier in the process and has much higher confidence in the client's identity in the authorization process than before. This generally improves security since it prevents attempts to spoof clients that are capable of authenticating early in the process. 
-
-Note that HTTP `POST` requests to the authorization endpoint via the user-agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
 
 ## Conventions and Terminology
 
