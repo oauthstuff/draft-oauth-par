@@ -142,10 +142,10 @@ NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 described in BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they
 appear in all capitals, as shown here.
 
-This specification uses the terms "access token", "refresh token",
-"authorization server", "resource server", "authorization endpoint",
-"authorization request", "authorization response", "token endpoint",
-"grant type", "access token request", "access token response", and
+This specification uses the terms "access token",
+"authorization server", "authorization endpoint",
+"authorization request", "token endpoint",
+and
 "client" defined by The OAuth 2.0 Authorization Framework [@!RFC6749].
 
 # Pushed Authorization Request Endpoint
