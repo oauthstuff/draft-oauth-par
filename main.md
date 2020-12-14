@@ -519,7 +519,7 @@ Specification Document(s):
 
    -05
    
-   * Mention use of invalid_request error code for cases, like a bad redirect_uri, that don't have a more specific one 
+   * Mention use of `invalid_request` error code for cases, like a bad `redirect_uri`, that don't have a more specific one 
 
 
    -04
