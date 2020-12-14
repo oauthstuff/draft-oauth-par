@@ -218,7 +218,7 @@ The following is an example of such a response:
 
 ## Error Response {#error_response}
 
-The authorization server returns an error response with the same format as is specified for error responses from the token endpoint in Section 5.2 of [@!RFC6749] using the appropriate error code from therein or from Section 4.1.2.1 of [@!RFC6749].  Error codes defined by OAuth extension can also be used when such an extension is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorization request does not involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are never returned.
+The authorization server returns an error response with the same format as is specified for error responses from the token endpoint in Section 5.2 of [@!RFC6749] using the appropriate error code from therein or from Section 4.1.2.1 of [@!RFC6749].  In those cases where Section 4.1.2.1 of [@!RFC6749] prohibits automatic redirection with an error back to the requesting client and hence doesn’t define an error code, for example when the request fails due to a missing, invalid, or mismatching redirection URI, the `invalid_request` error code can be used as the default error code. Error codes defined by OAuth extension can also be used when such an extension is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorization request does not involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are never returned.
 
 If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
@@ -516,6 +516,11 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
+
+   -05
+   
+   * Mention use of invalid_request error code for cases, like a bad redirect_uri, that don't have a more specific one 
+
 
    -04
 
