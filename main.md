@@ -519,6 +519,10 @@ Specification Document(s):
 
    [[ To be removed from the final specification ]]
 
+   -06
+
+   * Add a note clarifying that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to know that it can use the PAR flow
+
    -05
    
    * Mention use of `invalid_request` error code for cases, like a bad `redirect_uri`, that don't have a more specific one 
