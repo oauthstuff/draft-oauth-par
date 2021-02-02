@@ -351,6 +351,8 @@ The following authorization server metadata [@!RFC8414] parameters are introduce
 `require_pushed_authorization_requests`
 : Boolean parameter indicating whether the authorization server accepts authorization request data only via the pushed authorization request method. If omitted, the default value is `false`. 
 
+Note that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to determine that it may use the pushed authorization request flow. A `request_uri` value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as `request_uri_parameter_supported` or `require_request_uri_registration`.
+
 # Client Metadata {#c_metadata}
 
 The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamically registering OAuth 2.0 client metadata with authorization servers. The metadata defined by [RFC7591], and registered extensions to it, also imply a general data model for clients that is useful for authorization server implementations even when the Dynamic Client Registration Protocol isn't in play. Such implementations will typically have some sort of user interface available for managing client configuration. The following client metadata parameter is introduced by this document to indicate whether pushed authorization requests are reqired for the given client. 
@@ -516,6 +518,10 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
+
+   -06
+
+   * Add a note clarifying that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to know that it can use the PAR flow
 
    -05
    
