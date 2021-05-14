@@ -100,7 +100,8 @@ A client typically initiates an authorization request by directing the user-agen
   Host: as.example.com
 ```
 
-Such a request could instead be pushed directly to the authorization server by the client as follows with a `POST` request to the pushed authorization request endpoint (extra line breaks for display purposes only):
+Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the pushed authorization request endpoint as illustrated in the following example (extra line breaks for display purposes only).
+The client can authenticate (e.g., using the `Authorization` header as shown) because the the request is made directly to the authorization server.
 
 ```
   POST /as/par HTTP/1.1
