@@ -186,7 +186,7 @@ This is illustrated by the following example (extra line breaks in the message-b
 
 The authorization server MUST process the request as follows:
 
-1. Authenticate the client in the same way as at the token endpoint.
+1. Authenticate the client in the same way as at the token endpoint (Section 2.3 of [@!RFC6749]).
 2. Reject the request if the `request_uri` authorization request parameter is provided.
 3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
 
