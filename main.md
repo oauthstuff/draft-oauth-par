@@ -405,6 +405,7 @@ Sean Glencross,
 Maggie Hung,
 Neil Madden,
 Karsten Meyer zu Selhausen,
+Roman Danyliw,
 and
 Takahiko Kawasaki
     for their valuable feedback on this draft.
@@ -519,6 +520,10 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
+
+   -08
+
+   * Updates to address feedback from AD Review https://mailarchive.ietf.org/arch/msg/oauth/bGSyonUqsvJ1vtY7l_ohwov25SA/
 
    -07
 
