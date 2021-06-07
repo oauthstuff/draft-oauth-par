@@ -101,7 +101,7 @@ A client typically initiates an authorization request by directing the user-agen
 ```
 
 Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the pushed authorization request endpoint as illustrated in the following example (extra line breaks for display purposes only).
-The client can authenticate (e.g., using the `Authorization` header as shown) because the the request is made directly to the authorization server.
+The client can authenticate (e.g., using the `Authorization` header as shown) because the request is made directly to the authorization server.
 
 ```
   POST /as/par HTTP/1.1
@@ -406,6 +406,7 @@ Maggie Hung,
 Neil Madden,
 Karsten Meyer zu Selhausen,
 Roman Danyliw,
+Meral Shirazipour,
 and
 Takahiko Kawasaki
     for their valuable feedback on this draft.
@@ -520,6 +521,10 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
+   
+   -09
+   
+   * Editorial fixes from Genart last call review
 
    -08
 
