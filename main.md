@@ -75,7 +75,7 @@ In OAuth [@!RFC6749] authorization request parameters are typically sent as URI 
 parameters via redirection in the user-agent. This is simple but also yields challenges:
 
 * There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the scope of access requested or swap the context of a payment transaction by changing scope values. Although protocol facilities exist to enable clients or users to detect some such changes, preventing modifications early in the process is a more robust solution.
-* There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user-agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of which can be significant, if personal identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
+* There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user-agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of such leakage can be significant, if personally identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
@@ -91,7 +91,7 @@ Note that HTTP `POST` requests to the authorization endpoint via the user-agent,
 
 ## Introductory Example
 
-A client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
+In traditional OAuth 2.0, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?response_type=code
@@ -188,9 +188,9 @@ The authorization server MUST process the request as follows:
 
 1. Authenticate the client in the same way as at the token endpoint (Section 2.3 of [@!RFC6749]).
 2. Reject the request if the `request_uri` authorization request parameter is provided.
-3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however such checks MUST then be performed at the authorization endpoint.
+3. Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server MAY omit validation steps that it is unable to perform when processing the pushed request, however, such checks MUST then be performed when processing the authorization request at the authorization endpoint.
 
-The authorization server MAY allow clients with authentication credentials to establish per-authorization request redirect URIs with every pushed authorization request. Described in more detail in (#redirect_uri_mgmt), this is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the ability to authenticate clients and validate client requests before the actual authorization request is performed.
+The authorization server MAY allow clients with authentication credentials to establish per-authorization-request redirect URIs with every pushed authorization request. Described in more detail in (#redirect_uri_mgmt), this is possible since, in contrast to [@!RFC6749], this specification gives the authorization server the ability to authenticate clients and validate client requests before the actual authorization request is performed.
 
 ## Successful Response {#par-response}
 
@@ -248,7 +248,7 @@ The following is an example of an error response from the pushed authorization r
 
 While OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
 
-The exact matching requirement MAY be relaxed when using pushed authorization requests for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a traditional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g. to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g. the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
+The exact matching requirement MAY be relaxed when using pushed authorization requests for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a traditional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g., to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g., the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
 
 Note: The ability to set up transaction specific redirect URIs is also useful in situations where client ids and corresponding credentials and policies are managed by a trusted 3rd party, e.g. via client certificates containing client permissions. Such an externally managed client could interact with an authorization server trusting the respective 3rd party without the need for an additional registration step.
 
@@ -347,7 +347,7 @@ Note: authorization server and clients MAY use metadata as defined in (#as_metad
 The following authorization server metadata [@!RFC8414] parameters are introduced to signal the server's capability and policy with respect to pushed authorization requests.
 
 `pushed_authorization_request_endpoint`
-: The URL of the pushed authorization request endpoint at which a client can post an authorization request in exchange for a `request_uri` value usable at the authorization server.
+: The URL of the pushed authorization request endpoint at which a client can post an authorization request to exchange for a `request_uri` value usable at the authorization server.
 
 `require_pushed_authorization_requests`
 : Boolean parameter indicating whether the authorization server accepts authorization request data only via the pushed authorization request method. If omitted, the default value is `false`. 
@@ -385,7 +385,7 @@ An attacker could capture the request URI from one request and then substitute i
 
 # Privacy Considerations
 
-OAuth 2.0 is a complex and flexible framework with broad ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure due to passing authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request rather than in the query component of a URL that passes through the user-agent in the clear.
+OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user-agent in the clear.
 
 # Acknowledgements {#Acknowledgements}
 
