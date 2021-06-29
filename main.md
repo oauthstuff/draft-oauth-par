@@ -381,7 +381,7 @@ authorization request using a particular request object. It is therefore recomme
 
 ## Request URI Swapping
 
-An attacker could capture the request URI from one request and then substitute it into a different authorization request. For example, in the context of OpenID Connect, an attacker could replace a request URI asking for a high level of authentication assurance with one that requires a lower level of assurance. Clients SHOULD make use of PKCE [@RFC7636], a unique `state` parameter [@RFC6749], or the OIDC “nonce” parameter [@OIDC] in the pushed request object to prevent this attack.
+An attacker could capture the request URI from one request and then substitute it into a different authorization request. For example, in the context of OpenID Connect, an attacker could replace a request URI asking for a high level of authentication assurance with one that requires a lower level of assurance. Clients SHOULD make use of PKCE [@RFC7636], a unique `state` parameter [@!RFC6749], or the OIDC “nonce” parameter [@OIDC] in the pushed request object to prevent this attack.
 
 # Privacy Considerations
 
