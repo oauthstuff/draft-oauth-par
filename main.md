@@ -69,13 +69,13 @@ Pushed authorization requests (PAR), defined by this document, enable OAuth [@!R
 to push the payload of an authorization request directly
 to the authorization server in exchange for a request URI value, which is used as reference
 to the authorization request payload data in a subsequent call to the authorization endpoint
-via the user-agent.
+via the user agent.
 
 In OAuth [@!RFC6749] authorization request parameters are typically sent as URI query
-parameters via redirection in the user-agent. This is simple but also yields challenges:
+parameters via redirection in the user agent. This is simple but also yields challenges:
 
 * There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the scope of access requested or swap the context of a payment transaction by changing scope values. Although protocol facilities exist to enable clients or users to detect some such changes, preventing modifications early in the process is a more robust solution.
-* There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user-agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of such leakage can be significant, if personally identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
+* There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of such leakage can be significant, if personally identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
 JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
@@ -87,11 +87,11 @@ PAR fosters OAuth security by providing clients a simple means for a confidentia
 PAR allows the authorization server to authenticate the client before any user interaction happens.
 The increased confidence in the identity of the client during the authorization process allows the authorization server to refuse illegitimate requests much earlier in the process, which can prevent attempts to spoof clients or otherwise tamper with or misuse an authorization request.
 
-Note that HTTP `POST` requests to the authorization endpoint via the user-agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
+Note that HTTP `POST` requests to the authorization endpoint via the user agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
 
 ## Introductory Example
 
-In traditional OAuth 2.0, a client typically initiates an authorization request by directing the user-agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
+In traditional OAuth 2.0, a client typically initiates an authorization request by directing the user agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?response_type=code
@@ -127,7 +127,7 @@ The authorization server responds with a request URI:
   }
 ```
 
-The client uses the request URI value to create the subsequent authorization request by directing the user-agent to make an HTTP request to the authorization server's authorization endpoint like the following (extra line breaks and indentation for display purposes only):
+The client uses the request URI value to create the subsequent authorization request by directing the user agent to make an HTTP request to the authorization server's authorization endpoint like the following (extra line breaks and indentation for display purposes only):
 
 ```
   GET /authorize?client_id=s6BhdRkqt3
@@ -326,14 +326,14 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
    
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user-agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
+The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
 ```
   GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
     %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
   Host: as.example.com
 ```
 
-Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user-agent.
+Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user agent.
 
 
 The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
@@ -385,7 +385,7 @@ An attacker could capture the request URI from one request and then substitute i
 
 # Privacy Considerations
 
-OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user-agent in the clear.
+OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user agent in the clear.
 
 # Acknowledgements {#Acknowledgements}
 
@@ -557,7 +557,7 @@ Specification Document(s):
    * Added text about motivations behind PAR - integrity, confidentiality and early client auth
    * Better explain one-time use recommendation of the request_uri
    * Drop the section on special error responses for request objects
-   * Clarify authorization request examples to say that the client directs the user-agent to make the HTTP GET request (vs. making the request itself)
+   * Clarify authorization request examples to say that the client directs the user agent to make the HTTP GET request (vs. making the request itself)
 
    -02
 
