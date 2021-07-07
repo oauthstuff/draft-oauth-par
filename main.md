@@ -82,7 +82,7 @@ JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solut
 
 This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri` value usable at the authorization server in a subsequent authorization request.
 
-PAR fosters OAuth security by providing clients a simple means for a confidential and integrity protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based request objects as defined by [@!I-D.ietf-oauth-jwsreq] in conduction with a pushed authorization request.
+PAR fosters OAuth security by providing clients a simple means for a confidential and integrity protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based request objects as defined by [@!I-D.ietf-oauth-jwsreq] in conduction with PAR.
 
 PAR allows the authorization server to authenticate the client before any user interaction happens.
 The increased confidence in the identity of the client during the authorization process allows the authorization server to refuse illegitimate requests much earlier in the process, which can prevent attempts to spoof clients or otherwise tamper with or misuse an authorization request.
@@ -100,7 +100,7 @@ In traditional OAuth 2.0, a client typically initiates an authorization request 
   Host: as.example.com
 ```
 
-Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the pushed authorization request endpoint as illustrated in the following example (extra line breaks for display purposes only).
+Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the PAR endpoint as illustrated in the following example (extra line breaks for display purposes only).
 The client can authenticate (e.g., using the `Authorization` header as shown) because the request is made directly to the authorization server.
 
 ```
@@ -151,20 +151,20 @@ and
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP `POST` requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The pushed authorization request endpoint URL MUST use the "https" scheme.
+The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP `POST` requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The PAR endpoint URL MUST use the "https" scheme.
 
-Authorization servers supporting pushed authorization requests SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
+Authorization servers supporting PAR SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
 
 The endpoint accepts the authorization request parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint MAY also support sending the set of authorization request parameters as a request object according to [@!I-D.ietf-oauth-jwsreq] and (#request_parameter).
 
-The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the pushed authorization request endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata [@RFC7591] parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the pushed authorization request endpoint. Similarly, the `token_endpoint_auth_methods_supported` authorization server metadata [@!RFC8414] parameter lists client authentication methods supported by the authorization server when accepting direct requests from clients, including requests to the pushed authorization request endpoint.
+The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the PAR endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata [@RFC7591] parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the PAR endpoint. Similarly, the `token_endpoint_auth_methods_supported` authorization server metadata [@!RFC8414] parameter lists client authentication methods supported by the authorization server when accepting direct requests from clients, including requests to the PAR endpoint.
 
 Due to historical reasons there is potential ambiguity regarding the appropriate audience
 value to use when employing JWT client assertion based authentication (defined in Section 2.2 of [@RFC7523] with `private_key_jwt` or `client_secret_jwt` authentication method names per Section 9 of [@OIDC]). To address that ambiguity the issuer identifier URL of the authorization server according to [@!RFC8414] SHOULD be used as the value of the audience. In order to facilitate interoperability the authorization server MUST accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.
 
 ## Request {#request}
 
-A client sends the parameters that comprise an authorization request directly to the pushed authorization request endpoint. A typical parameter set might include: `client_id`, `response_type`, `redirect_uri`, `scope`, `state`, `code_challenge`, and `code_challenge_method` as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at authorization endpoint including those defined in [@!RFC6749] as well as all applicable extensions. The `request_uri` authorization request parameter is one exception, which MUST NOT be provided.
+A client sends the parameters that comprise an authorization request directly to the PAR endpoint. A typical parameter set might include: `client_id`, `response_type`, `redirect_uri`, `scope`, `state`, `code_challenge`, and `code_challenge_method` as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at authorization endpoint including those defined in [@!RFC6749] as well as all applicable extensions. The `request_uri` authorization request parameter is one exception, which MUST NOT be provided.
 
 The request also includes, as appropriate for the given client, any additional parameters necessary for client authentication (e.g., `client_secret`, or `client_assertion` and `client_assertion_type`). Such parameters are defined and registered for use at the token endpoint but are applicable only for client authentication. When present in a pushed authorization request, they are relied upon only for client authentication and are not germane to the authorization request itself. Any token endpoint parameters that are not related to client authentication have no defined meaning for a pushed authorization request. The `client_id` parameter is defined with the same semantics for both authorization requests and requests to the token endpoint; as a required authorization request parameter, it is similarly required in a pushed authorization request.
 
@@ -223,7 +223,7 @@ The authorization server returns an error response with the same format as is sp
 
 If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
-In addition to the above, the pushed authorization request endpoint can also make use of the following HTTP status codes:
+In addition to the above, the PAR endpoint can also make use of the following HTTP status codes:
 
 * 405: If the request did not use the `POST` method, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.
 
@@ -231,7 +231,7 @@ In addition to the above, the pushed authorization request endpoint can also mak
 
 * 429: If the number of requests from a client during a particular time period exceeds the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.
 
-The following is an example of an error response from the pushed authorization request endpoint:
+The following is an example of an error response from the PAR endpoint:
 
 ```
   HTTP/1.1 400 Bad Request
@@ -248,7 +248,7 @@ The following is an example of an error response from the pushed authorization r
 
 OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint. However, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
 
-The exact matching requirement MAY be relaxed when using pushed authorization requests for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a traditional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g., to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g., the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
+The exact matching requirement MAY be relaxed when using PAR for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a traditional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g., to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g., the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
 
 Note: The ability to set up transaction specific redirect URIs is also useful in situations where client ids and corresponding credentials and policies are managed by a trusted 3rd party, e.g. via client certificates containing client permissions. Such an externally managed client could interact with an authorization server trusting the respective 3rd party without the need for an additional registration step.
 
@@ -338,28 +338,28 @@ Since parts of the authorization request content, e.g. the `code_challenge` para
 
 The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
 
-Authorization server policy MAY dictate, either globally or on a per-client basis, that pushed authorization requests are the only means for a client to pass authorization request data. In this case, the authorization server will refuse, using the `invalid_request` error code, to process any request to the authorization endpoint that does not have a `request_uri` parameter with a value obtained from the pushed authorization request endpoint.
+Authorization server policy MAY dictate, either globally or on a per-client basis, that PAR is the only means for a client to pass authorization request data. In this case, the authorization server will refuse, using the `invalid_request` error code, to process any request to the authorization endpoint that does not have a `request_uri` parameter with a value obtained from the PAR endpoint.
 
 Note: authorization server and clients MAY use metadata as defined in (#as_metadata) and (#c_metadata) to signal the desired behavior.
 
 # Authorization Server Metadata {#as_metadata}
 
-The following authorization server metadata [@!RFC8414] parameters are introduced to signal the server's capability and policy with respect to pushed authorization requests.
+The following authorization server metadata [@!RFC8414] parameters are introduced to signal the server's capability and policy with respect to PAR.
 
 `pushed_authorization_request_endpoint`
 : The URL of the pushed authorization request endpoint at which a client can post an authorization request to exchange for a `request_uri` value usable at the authorization server.
 
 `require_pushed_authorization_requests`
-: Boolean parameter indicating whether the authorization server accepts authorization request data only via the pushed authorization request method. If omitted, the default value is `false`. 
+: Boolean parameter indicating whether the authorization server accepts authorization request data only via PAR. If omitted, the default value is `false`. 
 
-Note that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to determine that it may use the pushed authorization request flow. A `request_uri` value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as `request_uri_parameter_supported` or `require_request_uri_registration`.
+Note that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to determine that it may use the PAR flow. A `request_uri` value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as `request_uri_parameter_supported` or `require_request_uri_registration`.
 
 # Client Metadata {#c_metadata}
 
 The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamically registering OAuth 2.0 client metadata with authorization servers. The metadata defined by [RFC7591], and registered extensions to it, also imply a general data model for clients that is useful for authorization server implementations even when the Dynamic Client Registration Protocol isn't in play. Such implementations will typically have some sort of user interface available for managing client configuration. The following client metadata parameter is introduced by this document to indicate whether pushed authorization requests are required for the given client.
 
 `require_pushed_authorization_requests`
-: Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is a pushed authorization request. If omitted, the default value is `false`.
+: Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is PAR. If omitted, the default value is `false`.
 
 
 # Security Considerations
@@ -385,7 +385,7 @@ An attacker could capture the request URI from one request and then substitute i
 
 # Privacy Considerations
 
-OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using pushed authorization requests, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user agent in the clear.
+OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using PAR, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user agent in the clear.
 
 # Acknowledgements {#Acknowledgements}
 
@@ -437,7 +437,7 @@ Metadata Name:
 : `require_pushed_authorization_requests`
 
 Metadata Description:
-: Indicates whether the authorization server accepts authorization request only via the pushed authorization request method. 
+: Indicates whether the authorization server accepts authorization requests only via PAR. 
 
 Change Controller:
 : IESG
@@ -455,7 +455,7 @@ Metadata Name:
 : `require_pushed_authorization_requests`
 
 Metadata Description:
-: Indicates whether the client is required to use the pushed authorization request method to initiate authorization requests.
+: Indicates whether the client is required to use the PAR to initiate authorization requests.
 
 Change Controller:
 : IESG
