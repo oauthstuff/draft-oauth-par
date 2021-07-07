@@ -55,7 +55,7 @@ organization="Auth0"
 
 .# Abstract
 
-This document defines the pushed authorization request endpoint, which allows
+This document defines the pushed authorization request (PAR) endpoint, which allows
 clients to push the payload of an OAuth 2.0 authorization request to the
 authorization server via a direct request and provides them
 with a request URI that is used as reference to the data in a
@@ -65,9 +65,9 @@ subsequent call to the authorization endpoint.
 
 # Introduction {#Introduction}
 
-Pushed authorization requests (PAR), defined by this document, enable OAuth [@!RFC6749] clients
+A pushed authorization request (PAR), defined by this document, enables an OAuth [@!RFC6749] client
 to push the payload of an authorization request directly
-to the authorization server in exchange for a request URI value, which is used as reference
+to the authorization server. A request URI value is received in in exchange, which is used as reference
 to the authorization request payload data in a subsequent call to the authorization endpoint
 via the user agent.
 
@@ -246,7 +246,7 @@ The following is an example of an error response from the pushed authorization r
 ```
 ## Management of Client Redirect URIs {#redirect_uri_mgmt}
 
-While OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances, or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
+OAuth 2.0 [@!RFC6749] allows clients to use unregistered `redirect_uri` values in certain circumstances or for the authorization server to apply its own matching semantics to the `redirect_uri` value presented by the client at the authorization endpoint. However, the OAuth Security BCP [@I-D.ietf-oauth-security-topics] as well as OAuth 2.1 [@I-D.ietf-oauth-v2-1] require an authorization server exactly match the `redirect_uri` parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.
 
 The exact matching requirement MAY be relaxed when using pushed authorization requests for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a traditional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server MAY allow such clients to specify `redirect_uri` values that were not previously registered with the authorization server. This will give the client more flexibility (e.g., to mint distinct redirect URI values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied `redirect_uri` values, e.g., the authorization server MAY require a certain URI prefix or allow only a query parameter to vary at runtime.
 
