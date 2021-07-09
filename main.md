@@ -351,7 +351,7 @@ The following authorization server metadata [@!RFC8414] parameters are introduce
 `require_pushed_authorization_requests`
 : Boolean parameter indicating whether the authorization server accepts authorization request data only via PAR. If omitted, the default value is `false`. 
 
-Note that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to determine that it may use the PAR flow. A `request_uri` value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as `request_uri_parameter_supported` or `require_request_uri_registration`.
+Note that the presence of `pushed_authorization_request_endpoint` is sufficient for a client to determine that it may use the PAR flow. A `request_uri` value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as `request_uri_parameter_supported` or `require_request_uri_registration` [@OIDC.Disco].
 
 # Client Metadata {#c_metadata}
 
@@ -513,6 +513,25 @@ Specification Document(s):
   </author>
   <date/>
  </front>
+</reference>
+
+<reference anchor="OIDC.Disco" target="http://openid.net/specs/openid-connect-discovery-1_0.html">
+  <front>
+    <title abbrev="OpenID Connect Discovery 1.0">OpenID Connect Discovery 1.0</title>
+    <author fullname="Nat Sakimura" initials="N." surname="Sakimura">
+      <organization abbrev="NRI">Nomura Research Institute, Ltd.</organization>
+    </author>
+    <author fullname="John Bradley" initials="J." surname="Bradley">
+      <organization abbrev="Ping Identity">Ping Identity</organization>
+    </author>
+    <author fullname="Michael B. Jones" initials="M.B." surname="Jones">
+      <organization abbrev="Microsoft">Microsoft</organization>
+    </author>
+    <author fullname="Edmund Jay" initials="E." surname="Jay">
+      <organization abbrev="Illumila">Illumila</organization>
+    </author>
+    <date day="8" month="November" year="2014" />
+  </front>
 </reference>
 
 {backmatter}
