@@ -333,8 +333,7 @@ The client uses the `request_uri` value returned by the authorization server to 
   Host: as.example.com
 ```
 
-Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user agent.
-
+Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user agent. An expired `request_uri` MUST be rejected as invalid.
 
 The authorization server MUST validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server MAY omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request, and that the request or the authorization server’s policy has not been modified in a way that would affect the outcome of the omitted steps.
 
