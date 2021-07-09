@@ -151,7 +151,7 @@ and
 
 # Pushed Authorization Request Endpoint
 
-The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP `POST` requests with parameters in the HTTP request entity-body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The PAR endpoint URL MUST use the "https" scheme.
+The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP `POST` requests with parameters in the HTTP request message body using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. The PAR endpoint URL MUST use the "https" scheme.
 
 Authorization servers supporting PAR SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
 
