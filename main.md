@@ -95,7 +95,7 @@ In traditional OAuth 2.0, a client typically initiates an authorization request 
 
 ```
   GET /authorize?response_type=code
-    &client_id=s6BhdRkqt3&state=af0ifjsldkj
+    &client_id=s6BhdRkqt3&state=duk681S8n00GsJpe7n9boxdzen
     &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
   Host: as.example.com
 ```
@@ -110,7 +110,7 @@ The client can authenticate (e.g., using the `Authorization` header as shown) be
   Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
 
   response_type=code
-  &client_id=s6BhdRkqt3&state=af0ifjsldkj
+  &client_id=s6BhdRkqt3&state=duk681S8n00GsJpe7n9boxdzen
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
 
@@ -170,7 +170,7 @@ The request also includes, as appropriate for the given client, any additional p
 
 The client constructs the message body of an HTTP `POST` request with `x-www-form-urlencoded` formatted parameters using a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. If applicable, the client also adds its authentication credentials to the request header or the request body using the same rules as for token endpoint requests.
 
-This is illustrated by the following example (extra line breaks in the message-body for display purposes only):
+This is illustrated by the following example (extra line breaks in the message body for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -212,7 +212,7 @@ The following is an example of such a response:
 
   {
     "request_uri": 
-      "urn:ietf:params:oauth:request_uri:bwc4JK-ESC0w8acc191e-Y1LTC2",
+      "urn:ietf:params:oauth:request_uri:6esc_11ACC5bwc014ltc14eY22c",
     "expires_in": 60
   }
 ```
@@ -256,7 +256,7 @@ Note: The ability to set up transaction specific redirect URIs is also useful in
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. Request parameters required by a given client authentication method are included in the `application/x-www-form-urlencoded` request directly, and are the only parameters other than `request` in the form body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`). All other request parameters, i.e., those pertaining to the authorization request itself, MUST appear as claims of the JWT representing the authorization request.
 
-The following is an example of a pushed authorization request using a signed request object. The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749] (extra line breaks for display purposes only):
+The following is an example of a pushed authorization request using a signed request object with the same authorization request payload as the example in (#request). The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749] (extra line breaks for display purposes only):
 
 ```
   POST /as/par HTTP/1.1
@@ -265,18 +265,18 @@ The following is an example of a pushed authorization request using a signed req
   Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
 
   request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
-  FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJyZXNwb2
-  5zZV90eXBlIjoiY29kZSIsImNsaWVudF9pZCI6InM2QmhkUmtxdDMiLCJyZWRpcmV
-  jdF91cmkiOiJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYiIsInNjb3BlIjoi
-  YWlzIiwic3RhdGUiOiJhZjBpZmpzbGRraiIsImNvZGVfY2hhbGxlbmdlIjoiSzItb
-  HRjODNhY2M0aDBjOXc2RVNDX3JFTVRKM2J3dy11Q0hhb2VLMXQ4VSIsImNvZGVfY2
-  hhbGxlbmdlX21ldGhvZCI6IlMyNTYifQ.O49ffUxRPdNkN3TRYDvbEYVr1CeAL64u
-  W4FenV3n9WlaFIRHeFblzv-wlEtMm8-tusGxeE9z3ek6FxkhvvLEqEpjthXnyXqqy
-  Jfq3k9GSf5ay74ml_0D6lHE1hy-kVWg7SgoPQ-GB1xQ9NRhF3EKS7UZIrUHbFUCF0
-  MsRLbmtIvaLYbQH_Ef3UkDLOGiU7exhVFTPeyQUTM9FF-u3K-zX-FO05_brYxNGLh
-  VkO1G8MjqQnn2HpAzlBd5179WTzTYhKmhTiwzH-qlBBI_9GLJmE3KOipko9TfSpa2
-  6H4JOlMyfZFl0PCJwkByS0xZFJ2sTo3Gkk488RQohhgt1I0onw
-  &client_id=s6BhdRkqt3
+  FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJleHAiOj
+  E2MjU4Njk2NzcsInJlc3BvbnNlX3R5cGUiOiJjb2RlIiwiY2xpZW50X2lkIjoiczZ
+  CaGRSa3F0MyIsInJlZGlyZWN0X3VyaSI6Imh0dHBzOi8vY2xpZW50LmV4YW1wbGUu
+  b3JnL2NiIiwic2NvcGUiOiJhY2NvdW50LWluZm9ybWF0aW9uIiwic3RhdGUiOiJhZ
+  jBpZmpzbGRraiIsImNvZGVfY2hhbGxlbmdlIjoiSzItbHRjODNhY2M0aDBjOXc2RV
+  NDX3JFTVRKM2J3dy11Q0hhb2VLMXQ4VSIsImNvZGVfY2hhbGxlbmdlX21ldGhvZCI
+  6IlMyNTYifQ.l9R3RC9bFBHry_8acObQjEf4fX5yfJkWUPfak3J3iiBm0aaQznPw5
+  BZ0B3VQZ9_KYdPt5bTkaflS5fSDklM3_7my9MyOSKFYmf46INk6ju_qUuC2crkOQX
+  ZWYJB-0bnYEbdHpUjazFSUvN49cEGstNQeE-dKDWHNgEojgcuNA_pjKfL9VYp1dEA
+  6-WjXZ_OlJ7R_mBWpjFAzc0UkQwqX5hfOJoGTqB2tE4a4aB2z8iYlUJp0DeeYp_hP
+  N6svtmdvte73p5bLGDFpRIlmrBQIAQuxiS0skORpXlS0cBcgHimXVnXOJG7E-A_lS
+  _5y54dVLQPA1jKYx-fxbYSG7dp2fw&client_id=s6BhdRkqt3
 ```
 
 The authorization server MUST take the following steps beyond the processing rules defined in (#request):
@@ -329,7 +329,7 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
 The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
 ```
   GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
-    %3Aoauth%3Arequest_uri%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+    %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
   Host: as.example.com
 ```
 
@@ -384,7 +384,7 @@ An attacker could capture the request URI from one request and then substitute i
 
 # Privacy Considerations
 
-OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using PAR, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message-body of an HTTP request, rather than in the query component of a URL that passes through the user agent in the clear.
+OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to the very nature of it having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. Using PAR, however, may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between client and authorization server over a secure connection in the message body of an HTTP request, rather than in the query component of a URL that passes through the user agent in the clear.
 
 # Acknowledgements {#Acknowledgements}
 
