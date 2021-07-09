@@ -87,7 +87,7 @@ PAR fosters OAuth security by providing clients a simple means for a confidentia
 PAR allows the authorization server to authenticate the client before any user interaction happens.
 The increased confidence in the identity of the client during the authorization process allows the authorization server to refuse illegitimate requests much earlier in the process, which can prevent attempts to spoof clients or otherwise tamper with or misuse an authorization request.
 
-Note that HTTP `POST` requests to the authorization endpoint via the user agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with mobile apps. Those apps typically invoke a custom tab with an URL that is translated into a GET request. Using `POST` would require the app to first open a web page under its control in the custom tab that in turn would initiate the form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits as described above.
+Note that HTTP `POST` requests to the authorization endpoint via the user agent, as described in Section 3.1 of [@!RFC6749] and Section 3.1.2.1 of [@OIDC], could also be used to cope with the request size limitations described above. However, it's only optional per [@!RFC6749] and, even when supported, it is a viable option for traditional web applications but is prohibitively difficult to use with native mobile applications. As described in [@RFC8252] those apps use platform-specific APIs to open the authorization request URI in the system browser. When a native app launches a browser, however, the resultant initial request is constrained to use the `GET` method. Using `POST` for the authorization request would require the app to first direct the browser to open a URI that the app controls via `GET` while somehow conveying the sizable authorization request payload and then have the resultant response contain content and script to initiate a cross-site form `POST` towards the authorization server. PAR is simpler to use and has additional security benefits described above.
 
 ## Introductory Example
 
@@ -525,6 +525,7 @@ Specification Document(s):
    -09
    
    * Editorial fixes from Genart last call review
+   * Updates from IESG evaluation comments
 
    -08
 
