@@ -168,7 +168,7 @@ A client sends the parameters that comprise an authorization request directly to
 
 The request also includes, as appropriate for the given client, any additional parameters necessary for client authentication (e.g., `client_secret`, or `client_assertion` and `client_assertion_type`). Such parameters are defined and registered for use at the token endpoint but are applicable only for client authentication. When present in a pushed authorization request, they are relied upon only for client authentication and are not germane to the authorization request itself. Any token endpoint parameters that are not related to client authentication have no defined meaning for a pushed authorization request. The `client_id` parameter is defined with the same semantics for both authorization requests and requests to the token endpoint; as a required authorization request parameter, it is similarly required in a pushed authorization request.
 
-The client adds the parameters in `x-www-form-urlencoded` format with a character encoding of UTF-8 as described in Appendix B of [@!RFC6749] to the body of an HTTP `POST` request. If applicable, the client also adds its authentication credentials to the request header or the request body using the same rules as for token endpoint requests.
+The client constructs the message body of an HTTP `POST` request with `x-www-form-urlencoded` formatted parameters using a character encoding of UTF-8 as described in Appendix B of [@!RFC6749]. If applicable, the client also adds its authentication credentials to the request header or the request body using the same rules as for token endpoint requests.
 
 This is illustrated by the following example (extra line breaks in the message-body for display purposes only):
 
