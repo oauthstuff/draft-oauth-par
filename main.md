@@ -94,45 +94,51 @@ Note that HTTP `POST` requests to the authorization endpoint via the user agent,
 In traditional OAuth 2.0, a client typically initiates an authorization request by directing the user agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):
 
 ```
-  GET /authorize?response_type=code
-    &client_id=s6BhdRkqt3&state=duk681S8n00GsJpe7n9boxdzen
-    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
-  Host: as.example.com
+ GET /authorize?response_type=code
+  &client_id=CLIENT1234&state=duk681S8n00GsJpe7n9boxdzen
+  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
+ Host: as.example.com
 ```
 
-Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the PAR endpoint as illustrated in the following example (extra line breaks for display purposes only).
-The client can authenticate (e.g., using the `Authorization` header as shown) because the request is made directly to the authorization server.
+Such a request could instead be pushed directly to the authorization server by the client with a `POST` request to the PAR endpoint as illustrated in the following example (extra line breaks and whitespace for display purposes only).
+The client can authenticate (e.g., using JWT client assertion based authentication as shown) because the request is made directly to the authorization server.
 
 ```
-  POST /as/par HTTP/1.1
-  Host: as.example.com
-  Content-Type: application/x-www-form-urlencoded
-  Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+ POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
 
-  response_type=code
-  &client_id=s6BhdRkqt3&state=duk681S8n00GsJpe7n9boxdzen
-  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &response_type=code
+ &client_id=CLIENT1234&state=duk681S8n00GsJpe7n9boxdzen
+ &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &client_assertion=eyJraWQiOiI0MiIsImFsZyI6IkVTMjU2In0.eyJpc3MiOiJDTE
+  lFTlQxMjM0Iiwic3ViIjoiQ0xJRU5UMTIzNCIsImF1ZCI6Imh0dHBzOi8vc2VydmVyL
+  mV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY4ODc4fQ.Igw8QrpAWRNPDGoWGRmJumLBM
+  wbLjeIYwqWUu-ywgvvufl_0sQJftNs3bzjIrP0BV9rRG-3eI1Ksh0kQ1CwvzA
+
 ```
 
 The authorization server responds with a request URI:  
 
 ```
-  HTTP/1.1 201 Created
-  Cache-Control: no-cache, no-store
-  Content-Type: application/json
+ HTTP/1.1 201 Created
+ Cache-Control: no-cache, no-store
+ Content-Type: application/json
 
-  {
-    "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
-    "expires_in": 90
-  }
+ {
+   "request_uri": "urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2",
+   "expires_in": 90
+ }
 ```
 
 The client uses the request URI value to create the subsequent authorization request by directing the user agent to make an HTTP request to the authorization server's authorization endpoint like the following (extra line breaks and indentation for display purposes only):
 
 ```
-  GET /authorize?client_id=s6BhdRkqt3
-    &request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
-  Host: as.example.com
+ GET /authorize?client_id=CLIENT1234
+  &request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+ Host: as.example.com
 ```
 
 ## Conventions and Terminology
@@ -173,15 +179,25 @@ The client constructs the message body of an HTTP `POST` request with `x-www-for
 This is illustrated by the following example (extra line breaks in the message body for display purposes only):
 
 ```
-  POST /as/par HTTP/1.1
-  Host: as.example.com
-  Content-Type: application/x-www-form-urlencoded
-  Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+ POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
 
-  response_type=code&state=af0ifjsldkj&client_id=s6BhdRkqt3
-  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-  &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
-  &code_challenge_method=S256&scope=account-information
+ response_type=code&state=af0ifjsldkj&client_id=s6BhdRkqt3
+ &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+ &code_challenge_method=S256&scope=account-information
+ &client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
 ```
 
 The authorization server MUST process the request as follows:
@@ -206,15 +222,15 @@ The `request_uri` value MUST be bound to the client that posted the authorizatio
 The following is an example of such a response:
 
 ```
-  HTTP/1.1 201 Created
-  Content-Type: application/json
-  Cache-Control: no-cache, no-store
+ HTTP/1.1 201 Created
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
 
-  {
-    "request_uri": 
-      "urn:ietf:params:oauth:request_uri:6esc_11ACC5bwc014ltc14eY22c",
-    "expires_in": 60
-  }
+ {
+  "request_uri": 
+    "urn:ietf:params:oauth:request_uri:6esc_11ACC5bwc014ltc14eY22c",
+  "expires_in": 60
+ }
 ```
 
 ## Error Response {#error_response}
@@ -234,15 +250,15 @@ In addition to the above, the PAR endpoint can also make use of the following HT
 The following is an example of an error response from the PAR endpoint:
 
 ```
-  HTTP/1.1 400 Bad Request
-  Content-Type: application/json
-  Cache-Control: no-cache, no-store
+ HTTP/1.1 400 Bad Request
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
 
-  {
-    "error": "invalid_request",
-    "error_description":
-      "The redirect_uri is not valid for the given client"
-  }
+ {
+   "error": "invalid_request",
+   "error_description":
+     "The redirect_uri is not valid for the given client"
+ }
 ```
 ## Management of Client Redirect URIs {#redirect_uri_mgmt}
 
@@ -256,15 +272,25 @@ Note: The ability to set up transaction specific redirect URIs is also useful in
 
 Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. Request parameters required by a given client authentication method are included in the `application/x-www-form-urlencoded` request directly, and are the only parameters other than `request` in the form body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`). All other request parameters, i.e., those pertaining to the authorization request itself, MUST appear as claims of the JWT representing the authorization request.
 
-The following is an example of a pushed authorization request using a signed request object with the same authorization request payload as the example in (#request). The client is authenticated by its client secret using the HTTP Basic Authentication scheme specified in Section 2.3.1 of [@!RFC6749] (extra line breaks for display purposes only):
+The following is an example of a pushed authorization request using a signed request object with the same authorization request payload as the example in (#request). The client is authenticated with JWT client assertion based authentication [@RFC7523] (extra line breaks and whitespace for display purposes only):
 
 ```
-  POST /as/par HTTP/1.1
-  Host: as.example.com
-  Content-Type: application/x-www-form-urlencoded
-  Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+ POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
 
-  request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
+ client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
+ &request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
   FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJleHAiOj
   E2MjU4Njk2NzcsInJlc3BvbnNlX3R5cGUiOiJjb2RlIiwiY2xpZW50X2lkIjoiczZ
   CaGRSa3F0MyIsInJlZGlyZWN0X3VyaSI6Imh0dHBzOi8vY2xpZW50LmV4YW1wbGUu
@@ -276,7 +302,8 @@ The following is an example of a pushed authorization request using a signed req
   ZWYJB-0bnYEbdHpUjazFSUvN49cEGstNQeE-dKDWHNgEojgcuNA_pjKfL9VYp1dEA
   6-WjXZ_OlJ7R_mBWpjFAzc0UkQwqX5hfOJoGTqB2tE4a4aB2z8iYlUJp0DeeYp_hP
   N6svtmdvte73p5bLGDFpRIlmrBQIAQuxiS0skORpXlS0cBcgHimXVnXOJG7E-A_lS
-  _5y54dVLQPA1jKYx-fxbYSG7dp2fw&client_id=s6BhdRkqt3
+  _5y54dVLQPA1jKYx-fxbYSG7dp2fw
+ &client_id=s6BhdRkqt3
 ```
 
 The authorization server MUST take the following steps beyond the processing rules defined in (#request):
@@ -328,9 +355,9 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
 
 The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
 ```
-  GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
-    %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
-  Host: as.example.com
+ GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
+  %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
+ Host: as.example.com
 ```
 
 Since parts of the authorization request content, e.g. the `code_challenge` parameter value, are unique to a particular authorization request, the client MUST only use a `request_uri` value once.  Authorization servers SHOULD treat `request_uri` values as one-time use but MAY allow for duplicate requests due to a user reloading/refreshing their user agent. An expired `request_uri` MUST be rejected as invalid.
