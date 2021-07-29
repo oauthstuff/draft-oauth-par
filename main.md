@@ -567,9 +567,9 @@ Specification Document(s):
 
    [[ To be removed from the final specification ]]
 
-    -10
+   -10
 
-    * Updates from mistakenly overlooked IESG evaluation comments
+   * Updates from mistakenly overlooked IESG evaluation comments
 
    -09
    
