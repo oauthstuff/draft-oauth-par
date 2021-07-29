@@ -396,7 +396,7 @@ try to impersonate the respective client. The authorization server MUST consider
 given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause (d) on request URI entropy.
 
 ## Open Redirection
-An attacker could try register a redirect URI pointing to a site under his control in order to obtain authorization codes or launch other attacks towards the user. The authorization server MUST only accept new redirect URIs in the pushed authorization request from authenticated clients. 
+An attacker could try to register a redirect URI pointing to a site under his control in order to obtain authorization codes or launch other attacks towards the user. The authorization server MUST only accept new redirect URIs in the pushed authorization request from authenticated clients.
 
 ## Request Object Replay
 An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the authorization server SHOULD make the request URIs one-time use.
@@ -477,10 +477,10 @@ Specification Document(s):
 This specification requests registration of the following value in the IANA "OAuth Dynamic Client Registration Metadata" registry of [@IANA.OAuth.Parameters] established by [@RFC7591].
 
 {spacing="compact"}
-Metadata Name:
+Client Metadata Name:
 : `require_pushed_authorization_requests`
 
-Metadata Description:
+Client Metadata Description:
 : Indicates whether the client is required to use the PAR to initiate authorization requests.
 
 Change Controller:
@@ -566,7 +566,11 @@ Specification Document(s):
 # Document History
 
    [[ To be removed from the final specification ]]
-   
+
+    -10
+
+    * Updates from mistakenly overlooked IESG evaluation comments
+
    -09
    
    * Editorial fixes from Genart last call review
