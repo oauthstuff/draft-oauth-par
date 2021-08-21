@@ -78,11 +78,11 @@ parameters via redirection in the user agent. This is simple but also yields cha
 * There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user agent in the clear and query string data can inadvertently leak to web server logs and to other sites via referer. The impact of such leakage can be significant, if personally identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).
 * Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.
 
-JWT Secured Authorization Request (JAR) [@!I-D.ietf-oauth-jwsreq] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
+JWT Secured Authorization Request (JAR) [@!RFC9101] provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a request object, which is a signed and optionally encrypted JSON Web Token (JWT) [@RFC7519]. In order to cope with the size restrictions, JAR introduces the `request_uri` parameter that allows clients to send a reference to a request object instead of the request object itself.
 
 This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a `request_uri` value usable at the authorization server in a subsequent authorization request.
 
-PAR fosters OAuth security by providing clients a simple means for a confidential and integrity protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based request objects as defined by [@!I-D.ietf-oauth-jwsreq] in conduction with PAR.
+PAR fosters OAuth security by providing clients a simple means for a confidential and integrity protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based request objects as defined by [@!RFC9101] in conduction with PAR.
 
 PAR allows the authorization server to authenticate the client before any user interaction happens.
 The increased confidence in the identity of the client during the authorization process allows the authorization server to refuse illegitimate requests much earlier in the process, which can prevent attempts to spoof clients or otherwise tamper with or misuse an authorization request.
@@ -161,7 +161,7 @@ The pushed authorization request endpoint is an HTTP API at the authorization se
 
 Authorization servers supporting PAR SHOULD include the URL of their pushed authorization request endpoint in their authorization server metadata document [@!RFC8414] using the `pushed_authorization_request_endpoint` parameter as defined in (#as_metadata).
 
-The endpoint accepts the authorization request parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint MAY also support sending the set of authorization request parameters as a request object according to [@!I-D.ietf-oauth-jwsreq] and (#request_parameter).
+The endpoint accepts the authorization request parameters defined in [@!RFC6749] for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include PKCE [@RFC7636], Resource Indicators [@RFC8707], and OpenID Connect [@OIDC]. The endpoint MAY also support sending the set of authorization request parameters as a request object according to [@!RFC9101] and (#request_parameter).
 
 The rules for client authentication as defined in [@!RFC6749] for token endpoint requests, including the applicable authentication methods, apply for the PAR endpoint as well. If applicable, the `token_endpoint_auth_method` client metadata [@RFC7591] parameter indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the PAR endpoint. Similarly, the `token_endpoint_auth_methods_supported` authorization server metadata [@!RFC8414] parameter lists client authentication methods supported by the authorization server when accepting direct requests from clients, including requests to the PAR endpoint.
 
@@ -237,7 +237,7 @@ The following is an example of such a response:
 
 The authorization server returns an error response with the same format as is specified for error responses from the token endpoint in Section 5.2 of [@!RFC6749] using the appropriate error code from therein or from Section 4.1.2.1 of [@!RFC6749].  In those cases where Section 4.1.2.1 of [@!RFC6749] prohibits automatic redirection with an error back to the requesting client and hence doesn’t define an error code, for example when the request fails due to a missing, invalid, or mismatching redirection URI, the `invalid_request` error code can be used as the default error code. Error codes defined by OAuth extension can also be used when such an extension is involved in the initial processing of authorization request that was pushed. Since initial processing of the pushed authorization request does not involve resource owner interaction, error codes related to user interaction, such as `consent_required` defined by [@!OIDC], are never returned.
 
-If the client is required to use signed request objects, either by authorization server or client policy (see [@!I-D.ietf-oauth-jwsreq], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
+If the client is required to use signed request objects, either by authorization server or client policy (see [@!RFC9101], section 10.5), the authorization server MUST only accept requests complying with the definition given in (#request_parameter) and MUST refuse any other request with HTTP status code 400 and error code `invalid_request`. 
 
 In addition to the above, the PAR endpoint can also make use of the following HTTP status codes:
 
@@ -270,7 +270,7 @@ Note: The ability to set up transaction specific redirect URIs is also useful in
 
 # The "request" Request Parameter {#request_parameter}
 
-Clients MAY use the `request` parameter as defined in JAR [@!I-D.ietf-oauth-jwsreq] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!I-D.ietf-oauth-jwsreq] apply. Request parameters required by a given client authentication method are included in the `application/x-www-form-urlencoded` request directly, and are the only parameters other than `request` in the form body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`). All other request parameters, i.e., those pertaining to the authorization request itself, MUST appear as claims of the JWT representing the authorization request.
+Clients MAY use the `request` parameter as defined in JAR [@!RFC9101] to push a request object JWT to the authorization server. The rules for processing, signing, and encryption of the request object as defined in JAR [@!RFC9101] apply. Request parameters required by a given client authentication method are included in the `application/x-www-form-urlencoded` request directly, and are the only parameters other than `request` in the form body (e.g. Mutual TLS client authentication [@RFC8705] uses the `client_id` HTTP request parameter while JWT assertion based client authentication [@RFC7523] uses `client_assertion` and `client_assertion_type`). All other request parameters, i.e., those pertaining to the authorization request itself, MUST appear as claims of the JWT representing the authorization request.
 
 The following is an example of a pushed authorization request using a signed request object with the same authorization request payload as the example in (#request). The client is authenticated with JWT client assertion based authentication [@RFC7523] (extra line breaks and whitespace for display purposes only):
 
@@ -308,8 +308,8 @@ The following is an example of a pushed authorization request using a signed req
 
 The authorization server MUST take the following steps beyond the processing rules defined in (#request):
 
-1. If applicable, decrypt the request object as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.1.
-1. Validate the request object signature as specified in JAR [@!I-D.ietf-oauth-jwsreq], section 6.2.
+1. If applicable, decrypt the request object as specified in JAR [@!RFC9101], section 6.1.
+1. Validate the request object signature as specified in JAR [@!RFC9101], section 6.2.
 1. If the client has authentication credentials established with the authorization server, reject the request if the authenticated `client_id` does not match the `client_id` claim in the request object. Additionally requiring the `iss` claim to match the `client_id` is at the discretion of authorization server.
 
 The following RSA key pair, represented in JWK [@RFC7517] format, can be used to validate or recreate the request object signature in the above example (extra line breaks and indentation within values for display purposes only):
@@ -353,7 +353,7 @@ The following RSA key pair, represented in JWK [@RFC7517] format, can be used to
    
 # Authorization Request
 
-The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!I-D.ietf-oauth-jwsreq]. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
+The client uses the `request_uri` value returned by the authorization server to build an authorization request as defined in [@!RFC9101]. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):
 ```
  GET /authorize?client_id=s6BhdRkqt3&request_uri=urn%3Aietf%3Aparams
   %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
@@ -393,7 +393,7 @@ The Dynamic Client Registration Protocol [@RFC7591] defines an API for dynamical
 ## Request URI Guessing
 An attacker could attempt to guess and replay a valid request URI value and
 try to impersonate the respective client. The authorization server MUST consider the considerations
-given in JAR [@!I-D.ietf-oauth-jwsreq], section 10.2, clause (d) on request URI entropy.
+given in JAR [@!RFC9101], section 10.2, clause (d) on request URI entropy.
 
 ## Open Redirection
 An attacker could try to register a redirect URI pointing to a site under his control in order to obtain authorization codes or launch other attacks towards the user. The authorization server MUST only accept new redirect URIs in the pushed authorization request from authenticated clients.
