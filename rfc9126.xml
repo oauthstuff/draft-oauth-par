@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rfc [
+ <!ENTITY nbsp    "&#160;">
+ <!ENTITY zwsp   "&#8203;">
+ <!ENTITY nbhy   "&#8209;">
+ <!ENTITY wj     "&#8288;">
+]> 
+
+<rfc version="3" ipr="trust200902" docName="draft-ietf-oauth-par-10" number="9126" submissionType="IETF" category="std" consensus="true" updates="" obsoletes="" tocInclude="true" symRefs="true" sortRefs="true" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<front>
+<title abbrev="OAuth PAR">OAuth 2.0 Pushed Authorization Requests</title>
+<seriesInfo name="RFC" value="9126"/>
+
+<author initials="T." surname="Lodderstedt" fullname="Torsten Lodderstedt"><organization>yes.com</organization><address><postal><street></street>
+</postal><email>torsten@lodderstedt.net</email>
+</address></author>
+
+<author initials="B." surname="Campbell" fullname="Brian Campbell"><organization>Ping Identity</organization><address><postal><street></street>
+</postal><email>bcampbell@pingidentity.com</email>
+</address></author>
+<author initials="N." surname="Sakimura" fullname="Nat Sakimura"><organization>NAT.Consulting</organization><address><postal><street></street>
+</postal><email>nat@sakimura.org</email>
+</address></author>
+
+<author initials="D." surname="Tonge" fullname="Dave Tonge"><organization>Moneyhub Financial Technology</organization><address><postal><street></street>
+</postal><email>dave@tonge.org</email>
+</address></author>
+
+<author initials="F." surname="Skokan" fullname="Filip Skokan"><organization>Auth0</organization><address><postal><street></street>
+</postal><email>panva.ip@gmail.com</email>
+</address></author>
+
+<date year="2021" month="August" />
+
+<area>Security</area>
+<workgroup>Web Authorization Protocol</workgroup>
+
+<keyword>security</keyword>
+<keyword>oauth2</keyword>
+
+<abstract>
+<t>This document defines the pushed authorization request (PAR) endpoint, which allows
+clients to push the payload of an OAuth 2.0 authorization request to the
+authorization server via a direct request and provides them
+with a request URI that is used as reference to the data in a
+subsequent call to the authorization endpoint.</t>
+</abstract>
+
+</front>
+
+<middle>
+
+<section anchor="Introduction"><name>Introduction</name>
+<t>This document defines the pushed authorization request (PAR) endpoint, which enables an OAuth <xref target="RFC6749"></xref> client
+to push the payload of an authorization request directly
+to the authorization server. A request URI value is received in exchange; it is used as reference
+to the authorization request payload data in a subsequent call to the authorization endpoint
+via the user agent.</t>
+<t>In OAuth <xref target="RFC6749"></xref>, authorization request parameters are typically sent as URI query
+parameters via redirection in the user agent. This is simple but also yields challenges:</t>
+
+<ul>
+<li>There is no cryptographic integrity and authenticity protection. An attacker could, for example, modify the scope of access requested or swap the context of a payment transaction by changing scope values. Although protocol facilities exist to enable clients or users to detect some such changes, preventing modifications early in the process is a more robust solution.</li>
+<li>There is no mechanism to ensure confidentiality of the request parameters. Although HTTPS is required for the authorization endpoint, the request data passes through the user agent in the clear, and query string data can inadvertently leak to web server logs and to other sites via the referer. The impact of such leakage can be significant, if personally identifiable information or other regulated data is sent in the authorization request (which might well be the case in identity, open banking, and similar scenarios).</li>
+<li>Authorization request URLs can become quite large, especially in scenarios requiring fine-grained authorization data, which might cause errors in request processing.</li>
+</ul>
+<t>JWT-Secured Authorization Request (JAR) <xref target="RFC9101"></xref> provides solutions for the security challenges by allowing OAuth clients to wrap authorization request parameters in a Request Object, which is a signed and optionally encrypted JSON Web Token (JWT) <xref target="RFC7519"></xref>.
+
+In order to cope with the size restrictions, JAR introduces the <tt>request_uri</tt> parameter that allows clients to send a reference to a Request Object instead of the Request Object itself.</t>
+<t>This document complements JAR by providing an interoperable way to push the payload of an authorization request directly to the authorization server in exchange for a <tt>request_uri</tt> value usable at the authorization server in a subsequent authorization request.</t>
+<t>PAR fosters OAuth security by providing clients a simple means for a confidential and integrity-protected authorization request. Clients requiring an even higher security level, especially cryptographically confirmed non-repudiation, are able to use JWT-based Request Objects as defined by <xref target="RFC9101"></xref> 
+
+in conjunction with PAR.</t>
+<t>PAR allows the authorization server to authenticate the client before any user interaction happens.
+The increased confidence in the identity of the client during the authorization process allows the authorization server to refuse illegitimate requests much earlier in the process, which can prevent attempts to spoof clients or otherwise tamper with or misuse an authorization request.</t>
+<t>Note that HTTP <tt>POST</tt> requests to the authorization endpoint via the user agent, as described in <xref target="RFC6749" sectionFormat="of" section="3.1"></xref> and Section 3.1.2.1 of <xref target="OIDC"></xref>, could also be used to cope with the request size limitations described above. However, it's only optional per <xref target="RFC6749"></xref>, and, even when supported, it is a viable option for conventional web applications but is prohibitively difficult to use with installed mobile applications. As described in <xref target="RFC8252"></xref>, those apps use platform-specific APIs to open the authorization request URI in the system browser. When a mobile app launches a browser, however, the resultant initial request is constrained to use the <tt>GET</tt> method. Using <tt>POST</tt> for the authorization request would require the app to first direct the browser to open a URI that the app controls via <tt>GET</tt> while somehow conveying the sizable authorization request payload and then having the resultant response contain the content and script to initiate a cross-site form <tt>POST</tt> towards the authorization server. PAR is simpler to use and has additional security benefits, as described above.</t>
+
+<section anchor="introductory-example"><name>Introductory Example</name>
+<t>In conventional OAuth 2.0, a client typically initiates an authorization request by directing the user agent to make an HTTP request like the following to the authorization server's authorization endpoint (extra line breaks and indentation for display purposes only):</t>
+
+<sourcecode type="http-message"> GET /authorize?response_type=code
+  &amp;client_id=CLIENT1234&amp;state=duk681S8n00GsJpe7n9boxdzen
+  &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
+ Host: as.example.com
+</sourcecode>
+<t>Such a request could instead be pushed directly to the authorization server by the client with a <tt>POST</tt> request to the PAR endpoint as illustrated in the following example (extra line breaks and spaces for display purposes only).
+The client can authenticate (e.g., using JWT client assertion-based authentication as shown) because the request is made directly to the authorization server.</t>
+
+<sourcecode type="http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ &amp;response_type=code
+ &amp;client_id=CLIENT1234&amp;state=duk681S8n00GsJpe7n9boxdzen
+ &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &amp;client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiI0MiIsImFsZyI6IkVTMjU2In0.eyJpc3MiOiJDTE
+  lFTlQxMjM0Iiwic3ViIjoiQ0xJRU5UMTIzNCIsImF1ZCI6Imh0dHBzOi8vc2VydmVyL
+  mV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY4ODc4fQ.Igw8QrpAWRNPDGoWGRmJumLBM
+  wbLjeIYwqWUu-ywgvvufl_0sQJftNs3bzjIrP0BV9rRG-3eI1Ksh0kQ1CwvzA
+
+</sourcecode>
+<t>The authorization server responds with a request URI:</t>
+
+<sourcecode type="http-message"> HTTP/1.1 201 Created
+ Cache-Control: no-cache, no-store
+ Content-Type: application/json
+
+ {
+   &quot;request_uri&quot;: &quot;urn:example:bwc4JK-ESC0w8acc191e-Y1LTC2&quot;,
+   &quot;expires_in&quot;: 90
+ }
+</sourcecode>
+<t>The client uses the request URI value to create the subsequent authorization request by directing the user agent to make an HTTP request to the authorization server's authorization endpoint like the following (extra line breaks and indentation for display purposes only):</t>
+
+<sourcecode type="http-message"> GET /authorize?client_id=CLIENT1234
+  &amp;request_uri=urn%3Aexample%3Abwc4JK-ESC0w8acc191e-Y1LTC2 HTTP/1.1
+ Host: as.example.com
+</sourcecode>
+</section>
+
+<section anchor="conventions-and-terminology"><name>Conventions and Terminology</name>
+        <t>
+    The key words "<bcp14>MUST</bcp14>", "<bcp14>MUST NOT</bcp14>", "<bcp14>REQUIRED</bcp14>", "<bcp14>SHALL</bcp14>", "<bcp14>SHALL
+    NOT</bcp14>", "<bcp14>SHOULD</bcp14>", "<bcp14>SHOULD NOT</bcp14>", "<bcp14>RECOMMENDED</bcp14>", "<bcp14>NOT RECOMMENDED</bcp14>",
+    "<bcp14>MAY</bcp14>", and "<bcp14>OPTIONAL</bcp14>" in this document are to be interpreted as
+    described in BCP&nbsp;14 <xref target="RFC2119"/> <xref target="RFC8174"/> 
+    when, and only when, they appear in all capitals, as shown here.
+        </t>
+
+<t>This specification uses the terms &quot;access token&quot;,
+&quot;authorization server&quot;, &quot;authorization endpoint&quot;,
+&quot;authorization request&quot;, &quot;token endpoint&quot;,
+and
+&quot;client&quot; defined by "The OAuth 2.0 Authorization Framework" <xref target="RFC6749" format="default"/>.</t>
+</section>
+</section>
+
+<section anchor="pushed-authorization-request-endpoint"><name>Pushed Authorization Request Endpoint</name>
+<t>The pushed authorization request endpoint is an HTTP API at the authorization server that accepts HTTP <tt>POST</tt> requests with parameters in the HTTP request message body using the <tt>application/x-www-form-urlencoded</tt> format. This format has a character encoding of UTF-8, as described in <xref target="RFC6749" sectionFormat="of" section="B"></xref>. The PAR endpoint URL <bcp14>MUST</bcp14> use the &quot;https&quot; scheme.</t>
+<t>Authorization servers supporting PAR <bcp14>SHOULD</bcp14> include the URL of their pushed authorization request endpoint in their authorization server metadata document <xref target="RFC8414"></xref> using the <tt>pushed_authorization_request_endpoint</tt> parameter as defined in <xref target="as_metadata"></xref>.</t>
+<t>The endpoint accepts the authorization request parameters defined in <xref target="RFC6749"></xref> for the authorization endpoint as well as all applicable extensions defined for the authorization endpoint. Some examples of such extensions include Proof Key for Code Exchange (PKCE) <xref target="RFC7636"></xref>, Resource Indicators <xref target="RFC8707"></xref>, and OpenID Connect (OIDC) <xref target="OIDC"></xref>. The endpoint <bcp14>MAY</bcp14> also support sending the set of authorization request parameters as a Request Object according to <xref target="RFC9101"></xref> and <xref target="request_parameter"></xref> of this document.</t>
+<t>The rules for client authentication as defined in <xref target="RFC6749"></xref> for token endpoint requests, including the applicable authentication methods, apply for the PAR endpoint as well. If applicable, the <tt>token_endpoint_auth_method</tt> client metadata parameter <xref target="RFC7591"></xref> indicates the registered authentication method for the client to use when making direct requests to the authorization server, including requests to the PAR endpoint. Similarly, the <tt>token_endpoint_auth_methods_supported</tt> authorization server metadata <xref target="RFC8414"></xref> parameter lists client authentication methods supported by the authorization server when accepting direct requests from clients, including requests to the PAR endpoint.</t>
+<t>Due to historical reasons, there is potential ambiguity regarding the appropriate audience
+value to use when employing JWT client assertion-based authentication (defined in <xref target="RFC7523" sectionFormat="of" section="2.2"></xref> with <tt>private_key_jwt</tt> or <tt>client_secret_jwt</tt> authentication method names per Section 9 of <xref target="OIDC"></xref>). To address that ambiguity, the issuer identifier URL of the authorization server according to <xref target="RFC8414"></xref> <bcp14>SHOULD</bcp14> be used as the value of the audience. In order to facilitate interoperability, the authorization server <bcp14>MUST</bcp14> accept its issuer identifier, token endpoint URL, or pushed authorization request endpoint URL as values that identify it as an intended audience.</t>
+
+<section anchor="request"><name>Request</name>
+<t>A client sends the parameters that comprise an authorization request directly to the PAR endpoint. A typical parameter set might include: <tt>client_id</tt>, <tt>response_type</tt>, <tt>redirect_uri</tt>, <tt>scope</tt>, <tt>state</tt>, <tt>code_challenge</tt>, and <tt>code_challenge_method</tt> as shown in the example below. However, the pushed authorization request can be composed of any of the parameters applicable for use at the authorization endpoint, including those defined in <xref target="RFC6749"></xref> as well as all applicable extensions. The <tt>request_uri</tt> authorization request parameter is one exception, and it <bcp14>MUST NOT</bcp14> be provided.</t>
+<t>The request also includes, as appropriate for the given client, any additional parameters necessary for client authentication (e.g., <tt>client_secret</tt>  or <tt>client_assertion</tt> and <tt>client_assertion_type</tt>). Such parameters are defined and registered for use at the token endpoint but are applicable only for client authentication. When present in a pushed authorization request, they are relied upon only for client authentication and are not germane to the authorization request itself. Any token endpoint parameters that are not related to client authentication have no defined meaning for a pushed authorization request. The <tt>client_id</tt> parameter is defined with the same semantics for both authorization requests and requests to the token endpoint; as a required authorization request parameter, it is similarly required in a pushed authorization request.</t>
+<t>The client constructs the message body of an HTTP <tt>POST</tt> request with parameters formatted with <tt>x-www-form-urlencoded</tt> using a character encoding of UTF-8, as described in <xref target="RFC6749" sectionFormat="of" section="B"></xref>. If applicable, the client also adds its authentication credentials to the request header or the request body using the same rules as for token endpoint requests.</t>
+<t>This is illustrated by the following example (extra line breaks in the message body for display purposes only):</t>
+
+<sourcecode type="http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ response_type=code&amp;state=af0ifjsldkj&amp;client_id=s6BhdRkqt3
+ &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+ &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+ &amp;code_challenge_method=S256&amp;scope=account-information
+ &amp;client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
+</sourcecode>
+<t>The authorization server <bcp14>MUST</bcp14> process the request as follows:</t>
+
+<ol>
+<li>Authenticate the client in the same way as at the token endpoint (<xref target="RFC6749" sectionFormat="of" section="2.3"></xref>).</li>
+<li>Reject the request if the <tt>request_uri</tt> authorization request parameter is provided.</li>
+<li>Validate the pushed request as it would an authorization request sent to the authorization endpoint. For example, the authorization server checks whether the redirect URI matches one of the redirect URIs configured for the client and also checks whether the client is authorized for the scope for which it is requesting access. This validation allows the authorization server to refuse unauthorized or fraudulent requests early. The authorization server <bcp14>MAY</bcp14> omit validation steps that it is unable to perform when processing the pushed request; however, such checks <bcp14>MUST</bcp14> then be performed when processing the authorization request at the authorization endpoint.</li>
+</ol>
+<t>The authorization server <bcp14>MAY</bcp14> allow clients with authentication credentials to establish per-authorization-request redirect URIs with every pushed authorization request. Described in more detail in <xref target="redirect_uri_mgmt"></xref>, this is possible since, in contrast to <xref target="RFC6749"></xref>, this specification gives the authorization server the ability to authenticate clients and validate client requests before the actual authorization request is performed.</t>
+</section>
+
+<section anchor="par-response"><name>Successful Response</name>
+<t>If the verification is successful, the server <bcp14>MUST</bcp14> generate a request URI and provide it in the response with a <tt>201</tt> HTTP status code. The following parameters are included as top-level members in the message body of the HTTP response using the <tt>application/json</tt> media type as defined by <xref target="RFC8259"></xref>.
+</t>
+<dl newline="true">
+<dt>request_uri</dt><dd>The request URI corresponding to the authorization request posted. This URI is a single-use reference to the respective request data in the subsequent authorization request. The way the authorization process obtains the authorization request data is at the discretion of the authorization server and is out of scope of this specification. There is no need to make the authorization request data available to other parties via this URI.</dd>
+<dt>expires_in</dt><dd> A JSON number that represents the lifetime of the request URI in seconds as a positive integer. The request URI lifetime is at the discretion of the authorization server but will typically be relatively short (e.g., between 5 and 600 seconds).</dd>
+</dl>
+<t>The format of the <tt>request_uri</tt> value is at the discretion of the authorization server, but it <bcp14>MUST</bcp14> contain some part generated using a cryptographically strong pseudorandom algorithm such that it is computationally infeasible to predict or guess a valid value (see <xref target="RFC6749" sectionFormat="of" section="10.10"></xref> for specifics). The authorization server <bcp14>MAY</bcp14> construct the <tt>request_uri</tt> value using the form <tt>urn:ietf:params:oauth:request_uri:&lt;reference-value&gt;</tt> with <tt>&lt;reference-value&gt;</tt> as the random part of the URI that references the respective authorization request data.</t>
+<t>The <tt>request_uri</tt> value <bcp14>MUST</bcp14> be bound to the client that posted the authorization request.</t>
+<t>The following is an example of such a response:</t>
+
+<sourcecode type="http-message"> HTTP/1.1 201 Created
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+  &quot;request_uri&quot;: 
+    &quot;urn:ietf:params:oauth:request_uri:6esc_11ACC5bwc014ltc14eY22c&quot;,
+  &quot;expires_in&quot;: 60
+ }
+</sourcecode>
+</section>
+
+<section anchor="error_response"><name>Error Response</name>
+<t>The authorization server returns an error response with the same format as is specified for error responses from the token endpoint in <xref target="RFC6749" sectionFormat="of" section="5.2"></xref> using the appropriate error code from therein or from <xref target="RFC6749" sectionFormat="of" section="4.1.2.1"></xref>.  In those cases where <xref target="RFC6749" sectionFormat="of" section="4.1.2.1"></xref> prohibits automatic redirection with an error back to the requesting client and hence doesn't define an error code (for example, when the request fails due to a missing, invalid, or mismatching redirection URI), the <tt>invalid_request</tt> error code can be used as the default error code. Error codes defined by the OAuth extension can also be used when such an extension is involved in the initial processing of the authorization request that was pushed. Since initial processing of the pushed authorization request does not involve resource owner interaction, error codes related to user interaction, such as <tt>consent_required</tt> defined by <xref target="OIDC"></xref>, are never returned.</t>
+<t>If the client is required to use signed Request Objects, by either the authorization server or the client policy (see <xref target="RFC9101" sectionFormat="comma" section="10.5"></xref>), the authorization server <bcp14>MUST</bcp14> only accept requests complying with the definition given in <xref target="request_parameter"></xref> and <bcp14>MUST</bcp14> refuse any other request with HTTP status code 400 and error code <tt>invalid_request</tt>.</t>
+<t>In addition to the above, the PAR endpoint can also make use of the following HTTP status codes:</t>
+
+<dl indent="6">
+<dt>405:</dt><dd> If the request did not use the <tt>POST</tt> method, the authorization server responds with an HTTP 405 (Method Not Allowed) status code.</dd>
+<dt>413:</dt><dd> If the request size was beyond the upper bound that the authorization server allows, the authorization server responds with an HTTP 413 (Payload Too Large) status code.</dd>
+<dt>429:</dt><dd> If the number of requests from a client during a particular time period exceeds the number the authorization server allows, the authorization server responds with an HTTP 429 (Too Many Requests) status code.</dd>
+</dl>
+
+
+<t>The following is an example of an error response from the PAR endpoint:</t>
+
+<sourcecode type="http-message">HTTP/1.1 400 Bad Request
+ Content-Type: application/json
+ Cache-Control: no-cache, no-store
+
+ {
+   &quot;error&quot;: &quot;invalid_request&quot;,
+   &quot;error_description&quot;:
+     &quot;The redirect_uri is not valid for the given client&quot;
+ }
+</sourcecode>
+</section>
+
+<section anchor="redirect_uri_mgmt"><name>Management of Client Redirect URIs</name>
+<t>OAuth 2.0 <xref target="RFC6749"></xref> allows clients to use unregistered <tt>redirect_uri</tt> values in certain circumstances or for the authorization server to apply its own matching semantics to the <tt>redirect_uri</tt> value presented by the client at the authorization endpoint. However, the OAuth security BCP <xref target="I-D.ietf-oauth-security-topics"></xref> as well as the OAuth 2.1 specification <xref target="I-D.ietf-oauth-v2-1"></xref> require an authorization server to exactly match the <tt>redirect_uri</tt> parameter against the set of redirect URIs previously established for a particular client. This is a means for early detection of client impersonation attempts and prevents token leakage and open redirection. As a downside, this can make client management more cumbersome since the redirect URI is typically the most volatile part of a client policy.</t>
+<t>The exact matching requirement <bcp14>MAY</bcp14> be relaxed when using PAR for clients that have established authentication credentials with the authorization server. This is possible since, in contrast to a conventional authorization request, the authorization server authenticates the client before the authorization process starts and thus ensures it is interacting with the legitimate client. The authorization server <bcp14>MAY</bcp14> allow such clients to specify <tt>redirect_uri</tt> values that were not previously registered with the authorization server. This will give the client more flexibility (e.g., to mint distinct <tt>redirect_uri</tt> values per authorization server at runtime) and can simplify client management. It is at the discretion of the authorization server to apply restrictions on supplied <tt>redirect_uri</tt> values, e.g., the authorization server <bcp14>MAY</bcp14> require a certain URI prefix or allow only a query parameter to vary at runtime.</t>
+
+<aside><t>Note: The ability to set up transaction-specific redirect URIs is also useful in situations where client IDs and corresponding credentials and policies are managed by a trusted third party, e.g., via client certificates containing client permissions. Such an externally managed client could interact with an authorization server trusting the respective third party without the need for an additional registration step.</t></aside>
+</section>
+</section>
+
+<section anchor="request_parameter"><name>The &quot;request&quot; Request Parameter</name>
+<t>Clients <bcp14>MAY</bcp14> use the <tt>request</tt> parameter as defined in JAR <xref target="RFC9101"></xref> to push a Request Object JWT to the authorization server. The rules for processing, signing, and encryption of the Request Object as defined in JAR <xref target="RFC9101"></xref> apply. Request parameters required by a given client authentication method are included in the <tt>application/x-www-form-urlencoded</tt> request directly and are the only parameters other than <tt>request</tt> in the form body (e.g., mutual TLS client authentication <xref target="RFC8705"></xref> uses the <tt>client_id</tt> HTTP request parameter, while JWT assertion-based client authentication <xref target="RFC7523"></xref> uses <tt>client_assertion</tt> and <tt>client_assertion_type</tt>). All other request parameters, i.e., those pertaining to the authorization request itself, <bcp14>MUST</bcp14> appear as claims of the JWT representing the authorization request.</t>
+<t>The following is an example of a pushed authorization request using a signed Request Object with the same authorization request payload as the example in <xref target="request"></xref>. The client is authenticated with JWT client assertion-based authentication <xref target="RFC7523"></xref> (extra line breaks and spaces for display purposes only):</t>
+
+<sourcecode type="http-message"> POST /as/par HTTP/1.1
+ Host: as.example.com
+ Content-Type: application/x-www-form-urlencoded
+
+ client_assertion_type=
+  urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+ &amp;client_assertion=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3Mi
+  OiJzNkJoZFJrcXQzIiwic3ViIjoiczZCaGRSa3F0MyIsImF1ZCI6Imh0dHBzOi8vc
+  2VydmVyLmV4YW1wbGUuY29tIiwiZXhwIjoxNjI1ODY5Njc3fQ.te4IdnP_DK4hWrh
+  TWA6fyhy3fxlAQZAhfA4lmzRdpoP5uZb-E90R5YxzN1YDA8mnVdpgj_Bx1lG5r6se
+  f5TlckApA3hahhC804dcqlE4naEmLISmN1pds2WxTMOUzZY8aKKSDzNTDqhyTgE-K
+  dTb3RafRj7tdZb09zWs7c_moOvfVcQIoy5zz1BvLQKW1Y8JsYvdpu2AvpxRPbcP8W
+  yeW9B6PL6_fy3pXYKG3e-qUcvPa9kan-mo9EoSgt-YTDQjK1nZMdXIqTluK9caVJE
+  RWW0fD1Y11_tlOcJn-ya7v7d8YmFyJpkhZfm8x1FoeH0djEicXTixEkdRuzsgUCm6
+  GQ
+ &amp;request=eyJraWQiOiJrMmJkYyIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJzNkJoZ
+  FJrcXQzIiwiYXVkIjoiaHR0cHM6Ly9zZXJ2ZXIuZXhhbXBsZS5jb20iLCJleHAiOj
+  E2MjU4Njk2NzcsInJlc3BvbnNlX3R5cGUiOiJjb2RlIiwiY2xpZW50X2lkIjoiczZ
+  CaGRSa3F0MyIsInJlZGlyZWN0X3VyaSI6Imh0dHBzOi8vY2xpZW50LmV4YW1wbGUu
+  b3JnL2NiIiwic2NvcGUiOiJhY2NvdW50LWluZm9ybWF0aW9uIiwic3RhdGUiOiJhZ
+  jBpZmpzbGRraiIsImNvZGVfY2hhbGxlbmdlIjoiSzItbHRjODNhY2M0aDBjOXc2RV
+  NDX3JFTVRKM2J3dy11Q0hhb2VLMXQ4VSIsImNvZGVfY2hhbGxlbmdlX21ldGhvZCI
+  6IlMyNTYifQ.l9R3RC9bFBHry_8acObQjEf4fX5yfJkWUPfak3J3iiBm0aaQznPw5
+  BZ0B3VQZ9_KYdPt5bTkaflS5fSDklM3_7my9MyOSKFYmf46INk6ju_qUuC2crkOQX
+  ZWYJB-0bnYEbdHpUjazFSUvN49cEGstNQeE-dKDWHNgEojgcuNA_pjKfL9VYp1dEA
+  6-WjXZ_OlJ7R_mBWpjFAzc0UkQwqX5hfOJoGTqB2tE4a4aB2z8iYlUJp0DeeYp_hP
+  N6svtmdvte73p5bLGDFpRIlmrBQIAQuxiS0skORpXlS0cBcgHimXVnXOJG7E-A_lS
+  _5y54dVLQPA1jKYx-fxbYSG7dp2fw
+ &amp;client_id=s6BhdRkqt3
+</sourcecode>
+<t>The authorization server <bcp14>MUST</bcp14> take the following steps beyond the processing rules defined in <xref target="request"></xref>:</t>
+
+<ol>
+<li>If applicable, decrypt the Request Object as specified in JAR <xref target="RFC9101" sectionFormat="comma" section="6.1"></xref>.</li>
+<li>Validate the Request Object signature as specified in JAR <xref target="RFC9101" sectionFormat="comma" section="6.2"></xref>.</li>
+<li>If the client has authentication credentials established with the authorization server, reject the request if the authenticated <tt>client_id</tt> does not match the <tt>client_id</tt> claim in the Request Object. Additionally, requiring the <tt>iss</tt> claim to match the <tt>client_id</tt> is at the discretion of the authorization server.</li>
+</ol>
+<t>The following RSA key pair, represented in JSON Web Key (JWK) format <xref target="RFC7517"></xref>, can be used to validate or recreate the Request Object signature in the above example (extra line breaks and indentation within values for display purposes only):</t>
+
+<sourcecode type="json"> {
+   &quot;kty&quot;: &quot;RSA&quot;,
+   &quot;kid&quot;:&quot;k2bdc&quot;,
+   &quot;n&quot;: &quot;y9Lqv4fCp6Ei-u2-ZCKq83YvbFEk6JMs_pSj76eMkddWRuWX2aBKGHAtKlE
+         5P7_vn__PCKZWePt3vGkB6ePgzAFu08NmKemwE5bQI0e6kIChtt_6KzT5Oa
+         aXDFI6qCLJmk51Cc4VYFaxgqevMncYrzaW_50mZ1yGSFIQzLYP8bijAHGVj
+         dEFgZaZEN9lsn_GdWLaJpHrB3ROlS50E45wxrlg9xMncVb8qDPuXZarvghL
+         L0HzOuYRadBJVoWZowDNTpKpk2RklZ7QaBO7XDv3uR7s_sf2g-bAjSYxYUG
+         sqkNA9b3xVW53am_UZZ3tZbFTIh557JICWKHlWj5uzeJXaw&quot;,
+   &quot;e&quot;: &quot;AQAB&quot;,
+   &quot;d&quot;: &quot;LNwG_pCKrwowALpCpRdcOKlSVqylSurZhE6CpkRiE9cpDgGKIkO9CxPlXOL
+         zjqxXuQc8MdMqRQZTnAwgd7HH0B6gncrruV3NewI-XQV0ckldTjqNfOTz1V
+         Rs-jE-57KAXI3YBIhu-_0YpIDzdk_wBuAk661Svn0GsPQe7m9DoxdzenQu9
+         O_soewUhlPzRrTH0EeIqYI715rwI3TYaSzoWBmEPD2fICyj18FF0MPy_SQz
+         k3noVUUIzfzLnnJiWy_p63QBCMqjRoSHHdMnI4z9iVpIwJWQ3jO5n_2lC2-
+         cSgwjmKsFzDBbQNJc7qMG1N6EssJUwgGJxz1eAUFf0w4YAQ&quot;,
+   &quot;qi&quot;: &quot;J-mG0swR4FTy3atrcQ7dd0hhYn1E9QndN-
+         -sDG4EQO0RnFj6wIefCvwIc4
+         7hCtVeFnCTPYJNc_JyV-mU-9vlzS5GSNuyR5qdpsMZXUMpEvQcwKt23ffPZ
+         YGaqfKyEesmf_Wi8fFcE68H9REQjnniKrXm7w2-IuG_IrVJA9Ox-uU&quot;,
+   &quot;q&quot;: &quot;4hlMYAGa0dvogdK1jnxQ7J_Lqpqi99e-AeoFvoYpMPhthChTzwFZO9lQmUo
+         BpMqVQTws_s7vWGmt7ZAB3ywkurf0pV7BD0fweJiUzrWk4KJjxtmP_auuxr
+         jvm3s2FUGn6f0wRY9Z8Hj9A7C72DnYCjuZiJQMYCWDsZ8-d-L1a-s&quot;,
+   &quot;p&quot;: &quot;5sd9Er3I2FFT9R-gy84_oakEyCmgw036B_nfYEEOCwpSvi2z7UcIVK3bSEL
+         5WCW6BNgB3HDWhq8aYPirwQnqm0K9mX1E-4xM10WWZ-rP3XjYpQeS0Snru5
+         LFVWsAzi-FX7BOqBibSAXLdEGXcXa44l08iec_bPD3xduq5V_1YoE&quot;,
+   &quot;dq&quot;: &quot;Nz2PF3XM6bEc4XsluKZO70ErdYdKgdtIJReUR7Rno_tOZpejwlPGBYVW19
+         zpAeYtCT82jxroB2XqhLxGeMxEPQpsz2qTKLSe4BgHY2ml2uxSDGdjcsrbb
+         NoKUKaN1CuyZszhWl1n0AT_bENl4bJgQj_Fh0UEsQj5YBBUJt5gr_k&quot;,
+   &quot;dp&quot;: &quot;Zc877jirkkLOtyTs2vxyNe9KnMNAmOidlUc2tE_-0gAL4Lpo1hSwKCtKwe
+         ZJ-gkqt1hT-dwNx_0Xtg_-NXsadMRMwJnzBMYwYAfjApUkfqABc0yUCJJl3
+         KozRCugf1WXkU9GZAH2_x8PUopdNUEa70ISowPRh04HANKX4fkjWAE&quot;
+  }
+</sourcecode>
+</section>
+
+<section anchor="authorization-request"><name>Authorization Request</name>
+<t>The client uses the <tt>request_uri</tt> value returned by the authorization server to build an authorization request as defined in <xref target="RFC9101"></xref>. This is shown in the following example where the client directs the user agent to make the following HTTP request (extra line breaks and indentation for display purposes only):</t>
+
+<sourcecode type="http-message"> GET /authorize?client_id=s6BhdRkqt3&amp;request_uri=urn%3Aietf%3Aparams
+  %3Aoauth%3Arequest_uri%3A6esc_11ACC5bwc014ltc14eY22c HTTP/1.1
+ Host: as.example.com
+</sourcecode>
+<t>Since parts of the authorization request content, e.g., the <tt>code_challenge</tt> parameter value, are unique to a particular authorization request, the client <bcp14>MUST</bcp14> only use a <tt>request_uri</tt> value once.  Authorization servers <bcp14>SHOULD</bcp14> treat <tt>request_uri</tt> values as one-time use but <bcp14>MAY</bcp14> allow for duplicate requests due to a user reloading/refreshing their user agent. An expired <tt>request_uri</tt> <bcp14>MUST</bcp14> be rejected as invalid.</t>
+<t>The authorization server <bcp14>MUST</bcp14> validate authorization requests arising from a pushed request as it would any other authorization request. The authorization server <bcp14>MAY</bcp14> omit validation steps that it performed when the request was pushed, provided that it can validate that the request was a pushed request and that the request or the authorization server's policy has not been modified in a way that would affect the outcome of the omitted steps.</t>
+<t>Authorization server policy <bcp14>MAY</bcp14> dictate, either globally or on a per-client basis, that PAR be the only means for a client to pass authorization request data. In this case, the authorization server will refuse, using the <tt>invalid_request</tt> error code, to process any request to the authorization endpoint that does not have a <tt>request_uri</tt> parameter with a value obtained from the PAR endpoint.</t>
+<aside><t>Note: Authorization server and clients <bcp14>MAY</bcp14> use metadata as defined in Sections <xref target="as_metadata" format="counter"></xref> and <xref target="c_metadata" format="counter"></xref> to signal the desired behavior.</t></aside>
+</section>
+
+<section anchor="as_metadata"><name>Authorization Server Metadata</name>
+<t>The following authorization server metadata parameters <xref target="RFC8414"></xref> are introduced to signal the server's capability and policy with respect to PAR.</t>
+
+<dl newline="true">
+<dt>pushed_authorization_request_endpoint</dt>
+<dd>The URL of the pushed authorization request endpoint at which a client can post an authorization request to exchange for a <tt>request_uri</tt> value usable at the authorization server.</dd>
+<dt>require_pushed_authorization_requests</dt>
+<dd>Boolean parameter indicating whether the authorization server accepts authorization request data only via PAR. If omitted, the default value is <tt>false</tt>.</dd>
+</dl>
+
+<t>Note that the presence of <tt>pushed_authorization_request_endpoint</tt> is sufficient for a client to determine that it may use the PAR flow. A <tt>request_uri</tt> value obtained from the PAR endpoint is usable at the authorization endpoint regardless of other authorization server metadata such as <tt>request_uri_parameter_supported</tt> or <tt>require_request_uri_registration</tt> <xref target="OIDC.Disco"></xref>.</t>
+</section>
+
+<section anchor="c_metadata"><name>Client Metadata</name>
+<t>The Dynamic Client Registration Protocol <xref target="RFC7591"></xref> defines an API for dynamically registering OAuth 2.0 client metadata with authorization servers. The metadata defined by <xref target="RFC7591"/>, and registered extensions to it, also imply a general data model for clients that is useful for authorization server implementations even when the Dynamic Client Registration Protocol isn't in play. Such implementations will typically have some sort of user interface available for managing client configuration. The following client metadata parameter is introduced by this document to indicate whether pushed authorization requests are required for the given client.</t>
+
+<dl newline="true">
+<dt>require_pushed_authorization_requests</dt>
+<dd>Boolean parameter indicating whether the only means of initiating an authorization request the client is allowed to use is PAR. If omitted, the default value is <tt>false</tt>.</dd>
+</dl>
+</section>
+
+<section anchor="security-considerations"><name>Security Considerations</name>
+
+<section anchor="request-uri-guessing"><name>Request URI Guessing</name>
+<t>An attacker could attempt to guess and replay a valid request URI value and
+try to impersonate the respective client. 
+
+The authorization server <bcp14>MUST</bcp14> account for the considerations
+given in JAR <xref target="RFC9101" sectionFormat="comma" section="10.2"></xref>, clause (d) on request URI entropy.</t>
+</section>
+
+<section anchor="open-redirection"><name>Open Redirection</name>
+<t>An attacker could try to register a redirect URI pointing to a site under their control in order to obtain authorization codes or launch other attacks towards the user. The authorization server <bcp14>MUST</bcp14> only accept new redirect URIs in the pushed authorization request from authenticated clients.</t>
+</section>
+
+<section anchor="request-object-replay"><name>Request Object Replay</name>
+<t>An attacker could replay a request URI captured from a legitimate authorization request. In order to cope with such attacks, the authorization server <bcp14>SHOULD</bcp14> make the request URIs one-time use.</t>
+</section>
+
+<section anchor="client-policy-change"><name>Client Policy Change</name>
+<t>The client policy might change between the lodging of the Request Object and the
+authorization request using a particular Request Object. Therefore, it is recommended that the authorization server check the request parameter against the client policy when processing the authorization request.</t>
+</section>
+
+<section anchor="request-uri-swapping"><name>Request URI Swapping</name>
+<t>An attacker could capture the request URI from one request and then substitute it into a different authorization request. For example, in the context of OpenID Connect, an attacker could replace a request URI asking for a high level of authentication assurance with one that requires a lower level of assurance. Clients <bcp14>SHOULD</bcp14> make use of PKCE <xref target="RFC7636"></xref>, a unique <tt>state</tt> parameter <xref target="RFC6749"></xref>, or the OIDC "nonce" parameter <xref target="OIDC"></xref> in the pushed Request Object to prevent this attack.</t>
+</section>
+</section>
+
+<section anchor="privacy-considerations"><name>Privacy Considerations</name>
+<t>OAuth 2.0 is a complex and flexible framework with broad-ranging privacy implications due to its very nature of having one entity intermediate user authorization to data access between two other entities. The privacy considerations of all of OAuth are beyond the scope of this document, which only defines an alternative way of initiating one message sequence in the larger framework. However, using PAR may improve privacy by reducing the potential for inadvertent information disclosure since it passes the authorization request data directly between the client and authorization server over a secure connection in the message body of an HTTP request rather than in the query component of a URL that passes through the user agent in the clear.</t>
+</section>
+
+
+<section anchor="iana_considerations"><name>IANA Considerations</name>
+
+<section anchor="oauth-authorization-server-metadata"><name>OAuth Authorization Server Metadata</name>
+<t>IANA has registered the following values in the IANA &quot;OAuth Authorization Server Metadata&quot; registry of <xref target="IANA.OAuth.Parameters"></xref> established by <xref target="RFC8414"></xref>.</t>
+
+<dl spacing="compact">
+<dt>Metadata Name:</dt>
+<dd><tt>pushed_authorization_request_endpoint</tt></dd>
+<dt>Metadata Description:</dt>
+<dd>URL of the authorization server's pushed authorization request endpoint.</dd>
+<dt>Change Controller:</dt>
+<dd>IESG</dd>
+<dt>Specification Document(s):</dt>
+<dd><xref target="as_metadata"></xref> of RFC 9126</dd>
+</dl>
+
+<dl spacing="compact">
+<dt>Metadata Name:</dt>
+<dd><tt>require_pushed_authorization_requests</tt></dd>
+<dt>Metadata Description:</dt>
+<dd>Indicates whether the authorization server accepts authorization requests only via PAR.</dd>
+<dt>Change Controller:</dt>
+<dd>IESG</dd>
+<dt>Specification Document(s):</dt>
+<dd><xref target="as_metadata"></xref> of RFC 9126</dd>
+</dl>
+</section>
+
+<section anchor="oauth-dynamic-client-registration-metadata"><name>OAuth Dynamic Client Registration Metadata</name>
+<t>IANA has registered the following value in the IANA &quot;OAuth Dynamic Client Registration Metadata&quot; registry of <xref target="IANA.OAuth.Parameters"></xref> established by <xref target="RFC7591"></xref>.</t>
+
+<dl spacing="compact">
+<dt>Client Metadata Name:</dt>
+<dd><tt>require_pushed_authorization_requests</tt></dd>
+<dt>Client Metadata Description:</dt>
+<dd>Indicates whether the client is required to use PAR to initiate authorization requests.</dd>
+<dt>Change Controller:</dt>
+<dd>IESG</dd>
+<dt>Specification Document(s):</dt>
+<dd><xref target="c_metadata"></xref> of RFC 9126</dd>
+</dl>
+</section>
+
+<section anchor="oauth-uri-registration"><name>OAuth URI Registration</name>
+<t>IANA has registered the following value in the &quot;OAuth URI&quot; registry of <xref target="IANA.OAuth.Parameters"></xref> established by <xref target="RFC6755"></xref>.</t>
+
+<dl spacing="compact">
+<dt>URN:</dt>
+<dd><tt>urn:ietf:params:oauth:request_uri:</tt></dd>
+<dt>Common Name:</dt>
+<dd>A URN Sub-Namespace for OAuth Request URIs.</dd>
+<dt>Change Controller:</dt>
+<dd>IESG</dd>
+<dt>Specification Document(s):</dt>
+<dd><xref target="par-response"></xref> of RFC 9126</dd>
+</dl>
+</section>
+</section>
+
+</middle>
+
+<back>
+
+<displayreference target="I-D.ietf-oauth-security-topics" to="OAUTH-SECURITY-TOPICS"/>
+<displayreference target="I-D.ietf-oauth-v2-1" to="OAUTH-V2"/>
+<references>
+<name>References</name>
+<references><name>Normative References</name>
+
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6749.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8259.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8414.xml"/>
+
+<!-- [I-D.ietf-oauth-jwsreq] is now RFC 9101-->
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.9101.xml"/>
+
+
+</references>
+<references><name>Informative References</name>
+
+<!-- [I-D.ietf-oauth-security-topics] IESG state I-D Exists as of 8/24/21-->
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml-ids/reference.I-D.ietf-oauth-security-topics.xml"/>
+
+<!-- [I-D.ietf-oauth-v2-1] IESG state I-D Exists as of 8/24/21 -->
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml-ids/reference.I-D.ietf-oauth-v2-1.xml"/>
+
+<reference anchor="IANA.OAuth.Parameters" target="http://www.iana.org/assignments/oauth-parameters">
+  <front>
+    <title>OAuth Parameters</title>
+    <author>
+      <organization>IANA</organization>
+    </author>
+    <date></date>
+  </front>
+</reference>
+
+
+<reference anchor="OIDC" target="http://openid.net/specs/openid-connect-core-1_0.html">
+  <front>
+    <title>OpenID Connect Core 1.0 incorporating errata set 1</title>
+    <author fullname="Nat Sakimura" initials="N." surname="Sakimura">
+      <organization>NRI</organization>
+    </author>
+    <author fullname="John Bradley" initials="J." surname="Bradley">
+      <organization>Ping Identity</organization>
+    </author>
+    <author fullname="Mike Jones" initials="M." surname="Jones">
+      <organization>Microsoft</organization>
+    </author>
+    <author fullname="Breno de Medeiros" initials="B." surname="de Medeiros">
+      <organization>Google</organization>
+    </author>
+    <author fullname="Chuck Mortimore" initials="C." surname="Mortimore">
+      <organization>Salesforce</organization>
+    </author>
+    <date year="2014" month="November"></date>
+  </front>
+</reference>
+
+
+<reference anchor="OIDC.Disco" target="http://openid.net/specs/openid-connect-discovery-1_0.html">
+  <front>
+    <title>OpenID Connect Discovery 1.0 incorporating errata set 1</title>
+    <author fullname="Nat Sakimura" initials="N." surname="Sakimura">
+      <organization abbrev="NRI">Nomura Research Institute, Ltd.</organization>
+    </author>
+    <author fullname="John Bradley" initials="J." surname="Bradley">
+      <organization abbrev="Ping Identity">Ping Identity</organization>
+    </author>
+    <author fullname="Michael B. Jones" initials="M." surname="Jones">
+      <organization abbrev="Microsoft">Microsoft</organization>
+    </author>
+    <author fullname="Edmund Jay" initials="E." surname="Jay">
+      <organization abbrev="Illumila">Illumila</organization>
+    </author>
+    <date year="2014" month="November"></date>
+  </front>
+</reference>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6755.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7517.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7519.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7523.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7591.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7636.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8252.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8705.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8707.xml"/>
+</references>
+</references>
+<section anchor="Acknowledgements" numbered="false"><name>Acknowledgements</name>
+<t>This specification is based on the work on <eref target="https://bitbucket.org/openid/fapi/src/master/Financial_API_Pushed_Request_Object.md">Pushed Request Object</eref>
+conducted at the Financial-grade API Working Group at the OpenID Foundation. We would like to thank the members of the WG for their valuable contributions.</t>
+<t>We would like to thank
+<contact fullname="Vladimir Dzhuvinov"/>,
+<contact fullname="Aaron Parecki"/>,
+<contact fullname="Justin Richer"/>,
+<contact fullname="Sascha Preibisch"/>,
+<contact fullname="Daniel Fett"/>,
+<contact fullname="Michael B. Jones"/>,
+<contact fullname="Annabelle Backman"/>,
+<contact fullname="Joseph Heenan"/>,
+<contact fullname="Sean Glencross"/>,
+<contact fullname="Maggie Hung"/>,
+<contact fullname="Neil Madden"/>,
+<contact fullname="Karsten Meyer zu Selhausen"/>,
+<contact fullname="Roman Danyliw"/>,
+<contact fullname="Meral Shirazipour"/>,
+and
+<contact fullname="Takahiko Kawasaki"/>
+    for their valuable feedback on this document.</t>
+</section>
+
+
+</back>
+</rfc>
