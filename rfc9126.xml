@@ -220,7 +220,7 @@ value to use when employing JWT client assertion-based authentication (defined i
 
 <t>The following is an example of an error response from the PAR endpoint:</t>
 
-<sourcecode type="http-message">HTTP/1.1 400 Bad Request
+<sourcecode type="http-message"> HTTP/1.1 400 Bad Request
  Content-Type: application/json
  Cache-Control: no-cache, no-store
 
